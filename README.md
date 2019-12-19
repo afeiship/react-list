@@ -9,6 +9,8 @@ npm install -S @feizheng/react-list
 | property  | type  | description |
 | --------- | ----- | ----------- |
 | className | -     | -           |
+| nodeName  | any   | -           |
+| virtual  | any   | -           |
 | items     | array | -           |
 | template  | func  | -           |
 
