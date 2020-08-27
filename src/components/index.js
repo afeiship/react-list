@@ -37,6 +37,11 @@ export default class ReactList extends Component {
     template: noop
   };
 
+  get virtual() {
+    const { virtual, nodeName } = this.props;
+    return virtual || nodeName === React.Fragment;
+  }
+
   get childView() {
     const { items, template } = this.props;
     return items.map((item, index) => {
@@ -45,8 +50,8 @@ export default class ReactList extends Component {
   }
 
   get nodeName() {
-    const { virtual, nodeName } = this.props;
-    return virtual ? React.Fragment : nodeName;
+    const { nodeName } = this.props;
+    return this.virtual ? React.Fragment : nodeName;
   }
 
   get properties() {
@@ -59,7 +64,8 @@ export default class ReactList extends Component {
       virtual,
       ...props
     } = this.props;
-    return virtual
+
+    return this.virtual
       ? { children: this.childView }
       : {
           'data-component': CLASS_NAME,
