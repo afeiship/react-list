@@ -1,17 +1,33 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import noop from '@feizheng/noop';
+import classNames from 'classnames';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 
 const CLASS_NAME = 'react-list';
 
-export default class extends Component {
+export default class ReactList extends Component {
   static displayName = CLASS_NAME;
+  static version = '__VERSION__';
   static propTypes = {
+    /**
+     * The extended className for component.
+     */
     className: PropTypes.string,
+    /**
+     * If node name is React.Framgment.
+     */
     virtual: PropTypes.bool,
+    /**
+     * Use customize node name(tagName or ReactElement).
+     */
     nodeName: PropTypes.any,
+    /**
+     * List data source.
+     */
     items: PropTypes.array,
+    /**
+     * List item template.
+     */
     template: PropTypes.func
   };
 

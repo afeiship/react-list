@@ -1,15 +1,19 @@
-import ReactList from '../src/main';
-import ReactDOM from 'react-dom';
 import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactList from '../src/main';
 import './assets/style.scss';
 
 class App extends React.Component {
   state = {
     items: require('./assets/data.json')
-  }
+  };
 
   template = ({ item }) => {
-    return <div key={item.domId} className="is-item">{item.name}</div>
+    return (
+      <div key={item.domId} className="is-item">
+        {item.name}
+      </div>
+    );
   };
 
   render() {
