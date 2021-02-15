@@ -1,4 +1,4 @@
-import noop from '@feizheng/noop';
+import noop from '@jswork/noop';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
@@ -69,8 +69,8 @@ export default class ReactList extends Component {
       ? { children: this.childView }
       : {
           'data-component': CLASS_NAME,
-          children: this.childView,
-          className: classNames(CLASS_NAME, className),
+          'children': this.childView,
+          'className': classNames(CLASS_NAME, className),
           ...props
         };
   }

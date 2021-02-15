@@ -1,3 +1,4 @@
+import ReactDemokit from '@jswork/react-demokit';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactList from '../src/main';
@@ -18,9 +19,11 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app-container">
+      <ReactDemokit
+        className="p-3 app-container"
+        url="https://github.com/afeiship/react-list">
         <ReactList items={this.state.items} template={this.template} />
-      </div>
+      </ReactDemokit>
     );
   }
 }
