@@ -12,11 +12,13 @@ npm install -S @jswork/react-list
 ```
 
 ## properties
-| Name      | Type   | Required | Default | Description                           |
-| --------- | ------ | -------- | ------- | ------------------------------------- |
-| className | string | false    | -       | The extended className for component. |
-| value     | object | false    | null    | The changed value.                    |
-| onChange  | func   | false    | noop    | The change handler.                   |
+| Name      | Type   | Required | Default | Description                                       |
+| --------- | ------ | -------- | ------- | ------------------------------------------------- |
+| className | string | false    | -       | The extended className for component.             |
+| virtual   | bool   | false    | -       | If node name is React.Framgment.                  |
+| nodeName  | any    | false    | 'div'   | Use customize node name(tagName or ReactElement). |
+| items     | array  | false    | []      | List data source.                                 |
+| template  | func   | false    | noop    | List item template.                               |
 
 
 ## usage
@@ -39,13 +41,24 @@ npm install -S @jswork/react-list
   import './assets/style.scss';
 
   class App extends React.Component {
+    state = {
+      items: require('./assets/data.json')
+    };
+
+    template = ({ item }) => {
+      return (
+        <div key={item.domId} className="is-item">
+          {item.name}
+        </div>
+      );
+    };
+
     render() {
       return (
         <ReactDemokit
           className="p-3 app-container"
           url="https://github.com/afeiship/react-list">
-          <ReactList className="mb-5 has-text-white" />
-          <button className="button is-primary is-fullwidth">Start~</button>
+          <ReactList items={this.state.items} template={this.template} />
         </ReactDemokit>
       );
     }

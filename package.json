@@ -20,17 +20,8 @@
     "url": "git+https://github.com/afeiship/react-list.git"
   },
   "keywords": [
-    "boilerplate",
     "react",
-    "component",
-    "cra",
-    "template",
-    "webpack",
-    "sass",
-    "scss",
-    "docs",
-    "service-worker",
-    "sw"
+    "list"
   ],
   "author": "afei",
   "license": "MIT",
