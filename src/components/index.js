@@ -76,6 +76,8 @@ export default class ReactList extends Component {
   }
 
   render() {
+    const { items } = this.props;
+    if (!items || items.length === 0) return null;
     return React.createElement(this.nodeName, this.properties);
   }
 }
