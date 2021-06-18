@@ -26,6 +26,10 @@ export default class ReactList extends Component {
      */
     items: PropTypes.array,
     /**
+     * The collection size key.
+     */
+    sizeKey: PropTypes.string,
+    /**
      * List item template.
      */
     template: PropTypes.func
@@ -33,6 +37,7 @@ export default class ReactList extends Component {
 
   static defaultProps = {
     items: [],
+    sizeKey: 'length',
     nodeName: 'div',
     template: noop
   };
@@ -76,8 +81,8 @@ export default class ReactList extends Component {
   }
 
   render() {
-    const { items } = this.props;
-    if (!items || items.length === 0) return null;
+    const { items, sizeKey } = this.props;
+    if (!items || !items[sizeKey]) return null;
     return React.createElement(this.nodeName, this.properties);
   }
 }
