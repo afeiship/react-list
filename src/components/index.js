@@ -67,6 +67,7 @@ export default class ReactList extends Component {
       template,
       children,
       virtual,
+      sizeKey,
       ...props
     } = this.props;
 
