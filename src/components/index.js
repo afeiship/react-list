@@ -49,9 +49,7 @@ export default class ReactList extends Component {
 
   get childView() {
     const { items, template } = this.props;
-    return items.map((item, index) => {
-      return template({ item, index });
-    });
+    return items.map((item, index) => template({ item, index }));
   }
 
   get nodeName() {
