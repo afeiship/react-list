@@ -30,6 +30,10 @@ export default class ReactList extends Component {
      */
     sizeKey: PropTypes.string,
     /**
+     * The default allow empty element is null.
+     */
+    allowEmpty: PropTypes.bool,
+    /**
      * List item template.
      */
     template: PropTypes.func
@@ -39,7 +43,8 @@ export default class ReactList extends Component {
     items: [],
     sizeKey: 'length',
     nodeName: 'div',
-    template: noop
+    template: noop,
+    allowEmpty: false
   };
 
   get virtual() {
@@ -80,8 +85,8 @@ export default class ReactList extends Component {
   }
 
   render() {
-    const { items, sizeKey } = this.props;
-    if (!items || !items[sizeKey]) return null;
+    const { items, sizeKey, allowEmpty } = this.props;
+    if (!allowEmpty && (!items || !items[sizeKey])) return null;
     return React.createElement(this.nodeName, this.properties);
   }
 }
