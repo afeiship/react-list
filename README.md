@@ -12,14 +12,15 @@ npm install -S @jswork/react-list
 ```
 
 ## properties
-| Name      | Type   | Required | Default  | Description                                       |
-| --------- | ------ | -------- | -------- | ------------------------------------------------- |
-| className | string | false    | -        | The extended className for component.             |
-| virtual   | bool   | false    | -        | If node name is React.Framgment.                  |
-| nodeName  | any    | false    | 'div'    | Use customize node name(tagName or ReactElement). |
-| items     | array  | false    | []       | List data source.                                 |
-| sizeKey   | string | false    | 'length' | The collection size key.                          |
-| template  | func   | false    | noop     | List item template.                               |
+| Name       | Type   | Required | Default  | Description                                       |
+| ---------- | ------ | -------- | -------- | ------------------------------------------------- |
+| className  | string | false    | -        | The extended className for component.             |
+| virtual    | bool   | false    | -        | If node name is React.Framgment.                  |
+| nodeName   | any    | false    | 'div'    | Use customize node name(tagName or ReactElement). |
+| items      | array  | false    | []       | List data source.                                 |
+| sizeKey    | string | false    | 'length' | The collection size key.                          |
+| allowEmpty | bool   | false    | false    | The default allow empty element is null.          |
+| template   | func   | false    | noop     | List item template.                               |
 
 
 ## usage
