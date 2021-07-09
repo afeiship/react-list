@@ -71,6 +71,7 @@ export default class ReactList extends Component {
       children,
       virtual,
       sizeKey,
+      allowEmpty,
       ...props
     } = this.props;
 
