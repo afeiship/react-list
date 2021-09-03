@@ -1,44 +1,48 @@
 import noop from '@jswork/noop';
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 const CLASS_NAME = 'react-list';
+export interface TemplateArgs {
+  items: any[];
+  item: any;
+  index: number;
+}
 
-export default class ReactList extends Component {
+export interface ReactListProps {
+  /**
+   * List data source.
+   */
+  items: any[];
+  /**
+   * List item template.
+   */
+  template: (args: TemplateArgs) => any;
+  /**
+   * The extended className for component.
+   */
+  className?: string;
+  /**
+   * If node name is React.Framgment.
+   */
+  virtual?: boolean;
+  /**
+   * Use customize node name(tagName or ReactElement).
+   */
+  nodeName?: any;
+  /**
+   * The collection size key.
+   */
+  sizeKey?: string;
+  /**
+   * The default allow empty element is null.
+   */
+  allowEmpty?: boolean;
+}
+
+export default class ReactList extends Component<ReactListProps> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
-  static propTypes = {
-    /**
-     * The extended className for component.
-     */
-    className: PropTypes.string,
-    /**
-     * If node name is React.Framgment.
-     */
-    virtual: PropTypes.bool,
-    /**
-     * Use customize node name(tagName or ReactElement).
-     */
-    nodeName: PropTypes.any,
-    /**
-     * List data source.
-     */
-    items: PropTypes.array,
-    /**
-     * The collection size key.
-     */
-    sizeKey: PropTypes.string,
-    /**
-     * The default allow empty element is null.
-     */
-    allowEmpty: PropTypes.bool,
-    /**
-     * List item template.
-     */
-    template: PropTypes.func
-  };
-
   static defaultProps = {
     items: [],
     sizeKey: 'length',
@@ -52,7 +56,7 @@ export default class ReactList extends Component {
     return virtual || nodeName === React.Fragment;
   }
 
-  get childView() {
+  get children() {
     const { items, template } = this.props;
     return items.map((item, index) => template({ items, item, index }));
   }
@@ -86,7 +90,7 @@ export default class ReactList extends Component {
 
   render() {
     const { items, sizeKey, allowEmpty } = this.props;
-    if (!allowEmpty && (!items || !items[sizeKey])) return null;
-    return React.createElement(this.nodeName, this.properties, this.childView);
+    if (!allowEmpty && (!items || !items[sizeKey!])) return null;
+    return React.createElement(this.nodeName, this.properties, this.children);
   }
 }

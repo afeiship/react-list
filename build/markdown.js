@@ -7,23 +7,23 @@ require('@jswork/next-replace-in-file');
 
 nx.declare({
   statics: {
-    init: function() {
+    init: function () {
       var instance = new this();
       instance.reset();
       instance.replace();
     }
   },
   methods: {
-    reset: function() {
+    reset: function () {
       fs.copyFileSync('./build/TEMPLATE.md', './README.md');
     },
-    replace: function() {
-      const docApp = fs.readFileSync('./public/index.js').toString();
+    replace: function () {
+      const docApp = fs.readFileSync('./public/src/app.tsx').toString();
 
       nx.replaceInFile('README.md', [
-        ['__GENERATE_DOCS__', rmp('./src/components/index.js')],
-        ['__GENERATE_DAPP__', indentString(docApp, 2)],
-        ['../src/main', '@jswork/react-list']
+        ['__GENERATE_DOCS__', rmp('./src/components/index.tsx')],
+        ['__GENERATE_DAPP__', indentString(docApp, ' ', 2)],
+        ['../src/main', '@jswork/boilerplate-react-component']
       ]);
     }
   }

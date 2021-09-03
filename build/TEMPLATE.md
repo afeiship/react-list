@@ -1,5 +1,5 @@
 # react-list
-> A list component.
+> A list component for react.
 
 [![version][version-image]][version-url]
 [![license][license-image]][license-url]
@@ -17,22 +17,18 @@ __GENERATE_DOCS__
 ## usage
 1. import css
   ```scss
-  @import "~@jswork/react-list/dist/style.css";
+  @import "~@jswork/boilerplate-react-component/dist/style.css";
 
   // or use sass
-  @import "~@jswork/react-list/dist/style.scss";
+  @import "~@jswork/boilerplate-react-component/dist/style.scss";
 
   // customize your styles:
-  $react-list-options: ()
+  $boilerplate-react-component-options: ()
   ```
 2. import js
   ```js
 __GENERATE_DAPP__
   ```
-
-## documentation
-- https://afeiship.github.io/react-list/
-
 
 ## license
 Code released under [the MIT license](https://github.com/afeiship/react-list/blob/master/LICENSE.txt).

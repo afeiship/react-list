@@ -1,10 +1,13 @@
 {
+  "git": {
+    "requireCleanWorkingDir": false
+  },
   "hooks": {
     "after:init": [
-      "t2k"
+      "t2k",
+      "npm run docs"
     ],
     "after:bump": [
-      "npm run docs",
       "npm run build"
     ]
   },

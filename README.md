@@ -1,5 +1,5 @@
 # react-list
-> A list component.
+> A list component for react.
 
 [![version][version-image]][version-url]
 [![license][license-image]][license-url]
@@ -12,67 +12,44 @@ npm install -S @jswork/react-list
 ```
 
 ## properties
-| Name       | Type   | Required | Default  | Description                                       |
-| ---------- | ------ | -------- | -------- | ------------------------------------------------- |
-| className  | string | false    | -        | The extended className for component.             |
-| virtual    | bool   | false    | -        | If node name is React.Framgment.                  |
-| nodeName   | any    | false    | 'div'    | Use customize node name(tagName or ReactElement). |
-| items      | array  | false    | []       | List data source.                                 |
-| sizeKey    | string | false    | 'length' | The collection size key.                          |
-| allowEmpty | bool   | false    | false    | The default allow empty element is null.          |
-| template   | func   | false    | noop     | List item template.                               |
+| Name      | Type   | Required | Default | Description                           |
+| --------- | ------ | -------- | ------- | ------------------------------------- |
+| className | string | false    | -       | The extended className for component. |
+| value     | object | false    | null    | Default value.                        |
+| onChange  | func   | false    | noop    | The change handler.                   |
 
 
 ## usage
 1. import css
   ```scss
-  @import "~@jswork/react-list/dist/style.css";
+  @import "~@jswork/boilerplate-react-component/dist/style.css";
 
   // or use sass
-  @import "~@jswork/react-list/dist/style.scss";
+  @import "~@jswork/boilerplate-react-component/dist/style.scss";
 
   // customize your styles:
-  $react-list-options: ()
+  $boilerplate-react-component-options: ()
   ```
 2. import js
   ```js
-  import ReactDemokit from '@jswork/react-demokit';
   import React from 'react';
-  import ReactDOM from 'react-dom';
-  import ReactList from '@jswork/react-list';
-  import './assets/style.scss';
+  import ReactList from '../@jswork/boilerplate-react-component';
+  import styled from 'styled-components';
 
-  class App extends React.Component {
-    state = {
-      items: require('./assets/data.json')
-    };
+  const Container = styled.div`
+    width: 80%;
+    margin: 30px auto 0;
+  `;
 
-    template = ({ item }) => {
-      return (
-        <div key={item.domId} className="is-item">
-          {item.name}
-        </div>
-      );
-    };
-
-    render() {
-      return (
-        <ReactDemokit
-          className="p-3 app-container"
-          url="https://github.com/afeiship/react-list">
-          <ReactList items={this.state.items} template={this.template} />
-        </ReactDemokit>
-      );
-    }
-  }
-
-  ReactDOM.render(<App />, document.getElementById('app'));
+  export default (props: any) => {
+    return (
+      <Container>
+        <ReactList />
+      </Container>
+    );
+  };
 
   ```
-
-## documentation
-- https://afeiship.github.io/react-list/
-
 
 ## license
 Code released under [the MIT license](https://github.com/afeiship/react-list/blob/master/LICENSE.txt).
