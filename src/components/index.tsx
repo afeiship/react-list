@@ -26,11 +26,7 @@ export interface ReactListProps {
   /**
    * Use customize node name(tagName or ReactElement).
    */
-  as?: any;
-  /**
-   * The customize node props.
-   */
-  asProps?: any;
+  nodeName?: any;
   /**
    * The collection size key.
    */
@@ -64,8 +60,7 @@ class ReactList extends Component<ReactListProps> {
   get properties() {
     const {
       className,
-      as,
-      asProps,
+      nodeName,
       items,
       template,
       children,
@@ -75,21 +70,20 @@ class ReactList extends Component<ReactListProps> {
       ...props
     } = this.props;
 
-    if (as === React.Fragment) return null;
+    if (nodeName === React.Fragment) return null;
 
     return {
       'data-component': CLASS_NAME,
       'ref': forwardedRef,
       'className': classNames(CLASS_NAME, className),
       ...props,
-      ...asProps
     };
   }
 
   render() {
-    const { as, items, sizeKey, allowEmpty } = this.props;
+    const { nodeName, items, sizeKey, allowEmpty } = this.props;
     if (!allowEmpty && (!items || !items[sizeKey!])) return null;
-    return React.createElement(as, this.properties, this.children);
+    return React.createElement(nodeName, this.properties, this.children);
   }
 }
 
