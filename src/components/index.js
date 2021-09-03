@@ -75,19 +75,18 @@ export default class ReactList extends Component {
       ...props
     } = this.props;
 
-    return this.virtual
-      ? { children: this.childView }
-      : {
-          'data-component': CLASS_NAME,
-          'children': this.childView,
-          'className': classNames(CLASS_NAME, className),
-          ...props
-        };
+    if (this.virtual) return null;
+
+    return {
+      'data-component': CLASS_NAME,
+      'className': classNames(CLASS_NAME, className),
+      ...props
+    };
   }
 
   render() {
     const { items, sizeKey, allowEmpty } = this.props;
     if (!allowEmpty && (!items || !items[sizeKey])) return null;
-    return React.createElement(this.nodeName, this.properties);
+    return React.createElement(this.nodeName, this.properties, this.childView);
   }
 }
