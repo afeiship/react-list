@@ -9,14 +9,24 @@ const Container = styled.div`
 
 const items = ['item1', 'item2', 'item3', 'item4', 'item5'];
 
+// Usage: You can use your proxy just like you use
+// a regular button!
+
 export default (props: any) => {
+  const ref1 = React.createRef();
+  const ref2 = React.createRef();
+
   return (
     <Container>
       <ReactList
+        ref={ref1}
+        forwardedRef={ref2}
         nodeName="ul"
         items={items}
         template={({ item, index }) => <li key={index}>{item}</li>}
       />
+      <button onClick={(e) => console.log(ref1)}>click-instance-ref1</button>
+      <button onClick={(e) => console.log(ref2)}>click-dom-ref2</button>
     </Container>
   );
 };

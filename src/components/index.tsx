@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import React, { Component } from 'react';
 
 const CLASS_NAME = 'react-list';
+
 export interface TemplateArgs {
   items: any[];
   item: any;
@@ -38,9 +39,13 @@ export interface ReactListProps {
    * The default allow empty element is null.
    */
   allowEmpty?: boolean;
+  /**
+   * Reference to original ref instance(tag: dom).
+   */
+  forwardedRef?: any;
 }
 
-export default class ReactList extends Component<ReactListProps> {
+class ReactList extends Component<ReactListProps> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
   static defaultProps = {
@@ -76,6 +81,7 @@ export default class ReactList extends Component<ReactListProps> {
       virtual,
       sizeKey,
       allowEmpty,
+      forwardedRef,
       ...props
     } = this.props;
 
@@ -83,6 +89,7 @@ export default class ReactList extends Component<ReactListProps> {
 
     return {
       'data-component': CLASS_NAME,
+      'ref': forwardedRef,
       'className': classNames(CLASS_NAME, className),
       ...props
     };
@@ -94,3 +101,7 @@ export default class ReactList extends Component<ReactListProps> {
     return React.createElement(this.nodeName, this.properties, this.children);
   }
 }
+
+export default React.forwardRef((props: any, ref) => {
+  return <ReactList {...props} ref={ref} />;
+});
