@@ -24,13 +24,13 @@ export interface ReactListProps {
    */
   className?: string;
   /**
-   * If node name is React.Framgment.
-   */
-  virtual?: boolean;
-  /**
    * Use customize node name(tagName or ReactElement).
    */
-  nodeName?: any;
+  as?: any;
+  /**
+   * The customize node props.
+   */
+  asProps?: any;
   /**
    * The collection size key.
    */
@@ -51,54 +51,45 @@ class ReactList extends Component<ReactListProps> {
   static defaultProps = {
     items: [],
     sizeKey: 'length',
-    nodeName: 'div',
+    as: React.Fragment,
     template: noop,
     allowEmpty: false
   };
-
-  get virtual() {
-    const { virtual, nodeName } = this.props;
-    return virtual || nodeName === React.Fragment;
-  }
 
   get children() {
     const { items, template } = this.props;
     return items.map((item, index) => template({ items, item, index }));
   }
 
-  get nodeName() {
-    const { nodeName } = this.props;
-    return this.virtual ? React.Fragment : nodeName;
-  }
-
   get properties() {
     const {
       className,
-      nodeName,
+      as,
+      asProps,
       items,
       template,
       children,
-      virtual,
       sizeKey,
       allowEmpty,
       forwardedRef,
       ...props
     } = this.props;
 
-    if (this.virtual) return null;
+    if (as === React.Fragment) return null;
 
     return {
       'data-component': CLASS_NAME,
       'ref': forwardedRef,
       'className': classNames(CLASS_NAME, className),
-      ...props
+      ...props,
+      ...asProps
     };
   }
 
   render() {
-    const { items, sizeKey, allowEmpty } = this.props;
+    const { as, items, sizeKey, allowEmpty } = this.props;
     if (!allowEmpty && (!items || !items[sizeKey!])) return null;
-    return React.createElement(this.nodeName, this.properties, this.children);
+    return React.createElement(as, this.properties, this.children);
   }
 }
 

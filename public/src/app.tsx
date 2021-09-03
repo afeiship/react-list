@@ -21,7 +21,7 @@ export default (props: any) => {
       <ReactList
         ref={ref1}
         forwardedRef={ref2}
-        nodeName="ul"
+        as="ul"
         items={items}
         template={({ item, index }) => <li key={index}>{item}</li>}
       />
