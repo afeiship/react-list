@@ -47,7 +47,7 @@ class ReactList extends Component<ReactListProps> {
   static defaultProps = {
     items: [],
     sizeKey: 'length',
-    as: React.Fragment,
+    nodeName: React.Fragment,
     template: noop,
     allowEmpty: false
   };
