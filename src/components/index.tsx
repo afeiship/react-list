@@ -18,7 +18,7 @@ export interface ReactListProps {
   /**
    * List item template.
    */
-  template: (args: TemplateArgs) => any;
+  template?: (args: TemplateArgs) => any;
   /**
    * The extended className for component.
    */
