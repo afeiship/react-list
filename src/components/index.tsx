@@ -54,7 +54,7 @@ class ReactList extends Component<ReactListProps> {
 
   get children() {
     const { items, template } = this.props;
-    return items.map((item, index) => template({ items, item, index }));
+    return items.map((item, index) => template!({ items, item, index }));
   }
 
   get properties() {
