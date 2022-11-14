@@ -18,7 +18,7 @@ export interface ReactListProps {
   /**
    * List item template.
    */
-  template?: (args: TemplateArgs) => any;
+  template?: (args: TemplateArgs, opts?: any) => any;
   /**
    * The extended className for component.
    */
@@ -76,7 +76,7 @@ class ReactList extends Component<ReactListProps> {
       'data-component': CLASS_NAME,
       'ref': forwardedRef,
       'className': classNames(CLASS_NAME, className),
-      ...props,
+      ...props
     };
   }
 
