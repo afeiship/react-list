@@ -53,8 +53,6 @@ class ReactList extends Component<ReactListProps> {
     allowEmpty: false
   };
 
-  protected root = React.createRef<any>();
-
   get children() {
     const { items, template } = this.props;
     return items.map((item, index) => template!({ items, item, index }));
@@ -86,7 +84,6 @@ class ReactList extends Component<ReactListProps> {
   handleRef = (inRoot) => {
     const { forwardedRef } = this.props;
     classImperativeHandle(forwardedRef, inRoot);
-    this.root = inRoot;
   };
 
   render() {
