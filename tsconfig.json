@@ -19,7 +19,7 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "esModuleInterop":true,
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
@@ -28,7 +28,8 @@
     "noUnusedParameters": true
   },
   "include": [
-    "src"
+    "src",
+    "public"
   ],
   "exclude": [
     "node_modules",

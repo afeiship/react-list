@@ -1,6 +1,7 @@
 import noop from '@jswork/noop';
-import classNames from 'classnames';
-import React, { Component } from 'react';
+import cx from 'classnames';
+import React, { Component, Fragment } from 'react';
+import classImperativeHandle from '@jswork/class-imperative-handle';
 
 const CLASS_NAME = 'react-list';
 
@@ -26,7 +27,7 @@ export interface ReactListProps {
   /**
    * Use customize node name(tagName or ReactElement).
    */
-  nodeName?: any;
+  as?: any;
   /**
    * The collection size key.
    */
@@ -47,10 +48,12 @@ class ReactList extends Component<ReactListProps> {
   static defaultProps = {
     items: [],
     sizeKey: 'length',
-    nodeName: React.Fragment,
+    as: Fragment,
     template: noop,
     allowEmpty: false
   };
+
+  protected root = React.createRef<any>();
 
   get children() {
     const { items, template } = this.props;
@@ -60,7 +63,7 @@ class ReactList extends Component<ReactListProps> {
   get properties() {
     const {
       className,
-      nodeName,
+      as,
       items,
       template,
       children,
@@ -70,20 +73,26 @@ class ReactList extends Component<ReactListProps> {
       ...props
     } = this.props;
 
-    if (nodeName === React.Fragment) return null;
+    if (as === Fragment) return null;
 
     return {
       'data-component': CLASS_NAME,
-      'ref': forwardedRef,
-      'className': classNames(CLASS_NAME, className),
+      'ref': this.handleRef,
+      'className': cx(CLASS_NAME, className),
       ...props
     };
   }
 
+  handleRef = (inRoot) => {
+    const { forwardedRef } = this.props;
+    classImperativeHandle(forwardedRef, inRoot);
+    this.root = inRoot;
+  };
+
   render() {
-    const { nodeName, items, sizeKey, allowEmpty } = this.props;
+    const { as, items, sizeKey, allowEmpty } = this.props;
     if (!allowEmpty && (!items || !items[sizeKey!])) return null;
-    return React.createElement(nodeName, this.properties, this.children);
+    return React.createElement(as, this.properties, this.children);
   }
 }
 
