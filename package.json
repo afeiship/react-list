@@ -5,9 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/main.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
@@ -22,10 +20,8 @@
     "preset": "ts-jest",
     "testEnvironment": "node"
   },
-  "peerDependencies": {
-    "styled-components": "^5.3.0"
-  },
   "devDependencies": {
+    "styled-components": "^5.3.0",
     "@babel/core": "^7.12.10",
     "@jswork/next": "^1.0.4",
     "@jswork/next-replace-in-file": "^1.0.0",
@@ -78,11 +74,5 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "keywords": [
-    "react",
-    "list",
-    "each",
-    "for-each",
-    "map"
-  ]
+  "keywords": ["react", "list", "each", "for-each", "map"]
 }
