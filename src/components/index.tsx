@@ -9,6 +9,7 @@ export interface TemplateArgs {
   items: any[];
   item: any;
   index: number;
+  options?: any;
 }
 
 export interface ReactListProps {
@@ -28,6 +29,10 @@ export interface ReactListProps {
    * Use customize node name(tagName or ReactElement).
    */
   as?: any;
+  /**
+   * The extra options for template function.
+   */
+  options?: any;
   /**
    * The collection size key.
    */
@@ -54,8 +59,8 @@ class ReactList extends Component<ReactListProps> {
   };
 
   get children() {
-    const { items, template } = this.props;
-    return items.map((item, index) => template!({ items, item, index }));
+    const { items, template, options } = this.props;
+    return items.map((item, index) => template!({ items, item, index, options }));
   }
 
   get properties() {
@@ -68,6 +73,7 @@ class ReactList extends Component<ReactListProps> {
       sizeKey,
       allowEmpty,
       forwardedRef,
+      options,
       ...props
     } = this.props;
 
@@ -81,7 +87,7 @@ class ReactList extends Component<ReactListProps> {
     };
   }
 
-  handleRef = (inRoot) => {
+  handleRef = (inRoot: any) => {
     const { forwardedRef } = this.props;
     classImperativeHandle(forwardedRef, inRoot);
   };
