@@ -9,7 +9,7 @@ export interface TemplateArgs {
   items: any[];
   item: any;
   index: number;
-  options?: any;
+  options?: Record<string, any>;
 }
 
 export interface ReactListProps {
