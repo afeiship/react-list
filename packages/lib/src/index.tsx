@@ -24,7 +24,7 @@ export interface ReactListProps {
   /**
    * Empty template.
    */
-  templateEmpty?: () => ReactNode;
+  templateEmpty?: (args: TemplateArgs, opts?: any) => ReactNode;
   /**
    * The extended className for component.
    */
@@ -64,6 +64,11 @@ class ReactList extends Component<ReactListProps> {
     return items.map((item, index) => template!({ items, item, index, options }));
   }
 
+  get emptyView() {
+    const { items, templateEmpty, options } = this.props;
+    return templateEmpty!({ items, item: null, index: -1, options });
+  }
+
   get properties() {
     const { className, as, items, template, sizeKey, forwardedRef, options, ...props } = this.props;
 
@@ -83,8 +88,8 @@ class ReactList extends Component<ReactListProps> {
   };
 
   render() {
-    const { as, items, sizeKey, templateEmpty } = this.props;
-    if (!items || !items[sizeKey!]) return templateEmpty!();
+    const { as, items, sizeKey } = this.props;
+    if (!items || !items[sizeKey!]) return this.emptyView;
     return React.createElement(as, this.properties, this.children);
   }
 }

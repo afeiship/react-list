@@ -32,7 +32,10 @@ function App() {
       </nav>
       <ReactList
         items={users}
-        templateEmpty={() => <div className="p-2 text-center debug-blue text-gray-500">Empty View</div>}
+        templateEmpty={(args) => {
+          console.log('args: ', args);
+          return <div className="p-2 text-center debug-blue text-gray-500">Empty View</div>;
+        }}
         template={({ item, index }) => {
           return (
             <div key={index}>
