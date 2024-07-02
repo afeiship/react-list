@@ -56,8 +56,7 @@ class ReactList extends Component<ReactListProps> {
     sizeKey: 'length',
     as: Fragment,
     template: noop,
-    templateEmpty: noop,
-    allowEmpty: false
+    templateEmpty: noop
   };
 
   get children() {
@@ -71,7 +70,17 @@ class ReactList extends Component<ReactListProps> {
   }
 
   get properties() {
-    const { className, as, items, template, templateEmpty, sizeKey, forwardedRef, options, ...props } = this.props;
+    const {
+      className,
+      as,
+      items,
+      template,
+      templateEmpty,
+      sizeKey,
+      forwardedRef,
+      options,
+      ...props
+    } = this.props;
 
     if (as === Fragment) return null;
 
