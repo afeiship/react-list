@@ -4,6 +4,7 @@ import React, { Component, Fragment, ReactNode } from 'react';
 import classImperativeHandle from '@jswork/class-imperative-handle';
 
 const CLASS_NAME = 'react-list';
+export type TemplateCallback = (args: TemplateArgs, opts?: any) => ReactNode;
 
 export interface TemplateArgs {
   items: any[];
@@ -20,11 +21,11 @@ export interface ReactListProps {
   /**
    * List item template.
    */
-  template?: (args: TemplateArgs, opts?: any) => ReactNode;
+  template?: TemplateCallback;
   /**
    * Empty template.
    */
-  templateEmpty?: (args: TemplateArgs, opts?: any) => ReactNode;
+  templateEmpty?: TemplateCallback;
   /**
    * The extended className for component.
    */
@@ -56,7 +57,7 @@ class ReactList extends Component<ReactListProps> {
     as: Fragment,
     template: noop,
     templateEmpty: noop,
-    allowEmpty: false,
+    allowEmpty: false
   };
 
   get children() {
@@ -78,7 +79,7 @@ class ReactList extends Component<ReactListProps> {
       'data-component': CLASS_NAME,
       'ref': this.handleRef,
       'className': cx(CLASS_NAME, className),
-      ...props,
+      ...props
     };
   }
 
