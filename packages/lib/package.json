@@ -1,6 +1,6 @@
 {
   "name": "@jswork/react-list",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -35,5 +35,12 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
-  }
+  },
+  "keywords": [
+    "react",
+    "list",
+    "each",
+    "for-each",
+    "map"
+  ]
 }
