@@ -4,7 +4,7 @@ import React, { Component, Fragment, ReactNode } from 'react';
 import classImperativeHandle from '@jswork/class-imperative-handle';
 
 const CLASS_NAME = 'react-list';
-export type TemplateCallback = (args: TemplateArgs, opts?: any) => ReactNode;
+export type TemplateCallback = (args: TemplateArgs) => ReactNode;
 
 export interface TemplateArgs {
   items: any[];
