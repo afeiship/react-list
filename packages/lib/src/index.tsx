@@ -19,6 +19,10 @@ export interface ReactListProps {
    */
   items: any[];
   /**
+   * Whether to display the loading status.
+   */
+  loading?: boolean;
+  /**
    * List item template.
    */
   template?: TemplateCallback;
@@ -26,6 +30,10 @@ export interface ReactListProps {
    * Empty template.
    */
   templateEmpty?: TemplateCallback;
+  /**
+   * Loading template.
+   */
+  templateLoading?: TemplateCallback;
   /**
    * The extended className for component.
    */
@@ -64,9 +72,11 @@ class ReactList extends Component<ReactListProps> {
     return items.map((item, index) => template!({ items, item, index, options }));
   }
 
-  get emptyView() {
-    const { items, templateEmpty, options } = this.props;
-    return templateEmpty!({ items, item: null, index: -1, options });
+  get placeholderView() {
+    const { items, loading, templateEmpty, templateLoading, options } = this.props;
+    const emptyArgs = { items, item: null, index: -1, options };
+    const isLoadingTemplate = typeof loading === 'boolean' && loading;
+    return isLoadingTemplate ? templateLoading?.(emptyArgs) : templateEmpty?.(emptyArgs);
   }
 
   get properties() {
@@ -99,7 +109,7 @@ class ReactList extends Component<ReactListProps> {
 
   render() {
     const { as, items, sizeKey } = this.props;
-    if (!items || !items[sizeKey!]) return this.emptyView;
+    if (!items || !items[sizeKey!]) return this.placeholderView;
     return React.createElement(as, this.properties, this.children);
   }
 }
