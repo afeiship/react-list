@@ -115,7 +115,7 @@ class ReactList extends Component<ReactListProps> {
 
   render() {
     const { as, items, sizeKey, allowEmpty } = this.props;
-    if (!items || !items[sizeKey!] || (!allowEmpty && items[sizeKey!] === 0)) return this.placeholderView;
+    if ((!items || !items[sizeKey!]) && !allowEmpty) return this.placeholderView;
     return React.createElement(as, this.properties, this.children);
   }
 }
