@@ -15,6 +15,10 @@ export interface TemplateArgs {
 
 export interface ReactListProps {
   /**
+   * Whether to allow empty list.
+   */
+  allowEmpty?: boolean;
+  /**
    * List data source.
    */
   items: any[];
@@ -60,6 +64,7 @@ class ReactList extends Component<ReactListProps> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
   static defaultProps = {
+    allowEmpty: false,
     items: [],
     sizeKey: 'length',
     as: Fragment,
@@ -82,6 +87,7 @@ class ReactList extends Component<ReactListProps> {
   get properties() {
     const {
       className,
+      allowEmpty,
       as,
       items,
       template,
@@ -108,8 +114,8 @@ class ReactList extends Component<ReactListProps> {
   };
 
   render() {
-    const { as, items, sizeKey } = this.props;
-    if (!items || !items[sizeKey!]) return this.placeholderView;
+    const { as, items, sizeKey, allowEmpty } = this.props;
+    if (!items || !items[sizeKey!] || (!allowEmpty && items[sizeKey!] === 0)) return this.placeholderView;
     return React.createElement(as, this.properties, this.children);
   }
 }
