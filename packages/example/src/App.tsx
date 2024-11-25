@@ -6,6 +6,15 @@ import { useEffect, useState } from 'react';
 function App() {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const Template = ({ item, index }) => {
+    return (
+      <div key={index} className="border mb-1 debug-red">
+        <p className="text-sm text-gray-700">
+          {index + 1}, {item.name} - {item.age}
+        </p>
+      </div>
+    );
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -30,8 +39,7 @@ function App() {
         </button>
         <button
           className="btn btn-sm btn-primary"
-          onClick={() => setUsers([...users, { name: 'New', age: 10 }])}
-        >
+          onClick={() => setUsers([...users, { name: 'New', age: 10 }])}>
           Add New
         </button>
         <button className="btn btn-sm btn-error" onClick={() => setUsers(users.slice(0, -1))}>
@@ -48,15 +56,7 @@ function App() {
           templateEmpty={() => {
             return <div className="p-2 text-center debug-blue text-gray-500">Empty View</div>;
           }}
-          template={({ item, index }) => {
-            return (
-              <div key={index}>
-                <p className="text-sm text-gray-700">
-                  {index + 1}, {item.name} - {item.age}
-                </p>
-              </div>
-            );
-          }}
+          template={Template}
         />
       </div>
     </div>
