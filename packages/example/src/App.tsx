@@ -6,9 +6,11 @@ import { useEffect, useState } from 'react';
 function App() {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const Template = ({ item, index }) => {
+  const template = ({ item, index }) => {
+    const [v, setV] = useState(0);
     return (
       <div key={index} className="border mb-1 debug-red">
+        <span>Value: {v}</span>
         <p className="text-sm text-gray-700">
           {index + 1}, {item.name} - {item.age}
         </p>
@@ -50,13 +52,14 @@ function App() {
         <ReactList
           items={users}
           loading={isLoading}
+          isJsx
           templateLoading={() => {
             return <div className="p-2 text-center debug-blue text-gray-500">Loading...</div>;
           }}
           templateEmpty={() => {
             return <div className="p-2 text-center debug-blue text-gray-500">Empty View</div>;
           }}
-          template={Template}
+          template={template}
         />
       </div>
     </div>

@@ -27,17 +27,21 @@ export interface ReactListProps {
    */
   loading?: boolean;
   /**
+   * If template is jsx or function.
+   */
+  isJsx?: boolean;
+  /**
    * List item template.
    */
-  template?: TemplateCallback;
+  template?: TemplateCallback | React.FC<TemplateArgs>;
   /**
    * Empty template.
    */
-  templateEmpty?: TemplateCallback;
+  templateEmpty?: TemplateCallback | React.FC<TemplateArgs>;
   /**
    * Loading template.
    */
-  templateLoading?: TemplateCallback;
+  templateLoading?: TemplateCallback | React.FC<TemplateArgs>;
   /**
    * The extended className for component.
    */
@@ -64,23 +68,36 @@ class ReactList extends Component<ReactListProps> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
   static defaultProps = {
+    isJsx: false,
     allowEmpty: false,
     items: [],
     sizeKey: 'length',
     as: Fragment,
     template: noop,
-    templateEmpty: noop
+    templateEmpty: noop,
   };
 
   get children() {
-    const { items, template, options } = this.props;
+    const { items, template, options, isJsx } = this.props;
+    if (isJsx) {
+      const Component = template as React.FC<TemplateArgs>;
+      return items.map((item, index) => (
+        <Component key={index} items={items} item={item} index={index} options={options} />
+      ));
+    }
     return items.map((item, index) => template!({ items, item, index, options }));
   }
 
   get placeholderView() {
-    const { items, loading, templateEmpty, templateLoading, options } = this.props;
+    const { items, loading, templateEmpty, templateLoading, options, isJsx } = this.props;
     const emptyArgs = { items, item: null, index: -1, options };
     const isLoadingTemplate = typeof loading === 'boolean' && loading;
+    if (isJsx) {
+      const Component = isLoadingTemplate
+        ? (templateLoading as React.FC<TemplateArgs>)
+        : (templateEmpty as React.FC<TemplateArgs>);
+      return <Component {...emptyArgs} />;
+    }
     return isLoadingTemplate ? templateLoading?.(emptyArgs) : templateEmpty?.(emptyArgs);
   }
 
@@ -88,6 +105,7 @@ class ReactList extends Component<ReactListProps> {
     const {
       className,
       allowEmpty,
+      isJsx,
       as,
       items,
       template,
@@ -104,7 +122,7 @@ class ReactList extends Component<ReactListProps> {
       'data-component': CLASS_NAME,
       'ref': this.handleRef,
       'className': cx(CLASS_NAME, className),
-      ...props
+      ...props,
     };
   }
 
