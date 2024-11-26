@@ -5,6 +5,7 @@ import classImperativeHandle from '@jswork/class-imperative-handle';
 
 const CLASS_NAME = 'react-list';
 export type TemplateCallback = (args: TemplateArgs) => ReactNode;
+export type TemplateComponent = React.FC<TemplateArgs>;
 
 export interface TemplateArgs {
   items: any[];
@@ -33,15 +34,15 @@ export interface ReactListProps {
   /**
    * List item template.
    */
-  template?: TemplateCallback | React.FC<TemplateArgs>;
+  template?: TemplateCallback | TemplateComponent;
   /**
    * Empty template.
    */
-  templateEmpty?: TemplateCallback | React.FC<TemplateArgs>;
+  templateEmpty?: TemplateCallback | TemplateComponent;
   /**
    * Loading template.
    */
-  templateLoading?: TemplateCallback | React.FC<TemplateArgs>;
+  templateLoading?: TemplateCallback | TemplateComponent;
   /**
    * The extended className for component.
    */
@@ -80,7 +81,7 @@ class ReactList extends Component<ReactListProps> {
   get children() {
     const { items, template, options, isJsx } = this.props;
     if (isJsx) {
-      const Component = template as React.FC<TemplateArgs>;
+      const Component = template as TemplateComponent;
       return items.map((item, index) => (
         <Component key={index} items={items} item={item} index={index} options={options} />
       ));
@@ -94,8 +95,8 @@ class ReactList extends Component<ReactListProps> {
     const isLoadingTemplate = typeof loading === 'boolean' && loading;
     if (isJsx) {
       const Component = isLoadingTemplate
-        ? (templateLoading as React.FC<TemplateArgs>)
-        : (templateEmpty as React.FC<TemplateArgs>);
+        ? (templateLoading as TemplateComponent)
+        : (templateEmpty as TemplateComponent);
       return <Component {...emptyArgs} />;
     }
     return isLoadingTemplate ? templateLoading?.(emptyArgs) : templateEmpty?.(emptyArgs);
