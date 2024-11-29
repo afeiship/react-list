@@ -52,7 +52,7 @@ function App() {
         <ReactList
           items={users}
           loading={isLoading}
-          isJsx
+          hookable
           templateLoading={() => {
             return <div className="p-2 text-center debug-blue text-gray-500">Loading...</div>;
           }}

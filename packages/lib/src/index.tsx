@@ -28,9 +28,9 @@ export interface ReactListProps {
    */
   loading?: boolean;
   /**
-   * If template is jsx or function.
+   * If template can use react hook(as function component).
    */
-  isJsx?: boolean;
+  hookable?: boolean;
   /**
    * List item template.
    */
@@ -69,7 +69,7 @@ class ReactList extends Component<ReactListProps> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
   static defaultProps = {
-    isJsx: false,
+    hookable: false,
     allowEmpty: false,
     items: [],
     sizeKey: 'length',
@@ -79,8 +79,8 @@ class ReactList extends Component<ReactListProps> {
   };
 
   get children() {
-    const { items, template, options, isJsx } = this.props;
-    if (isJsx) {
+    const { items, template, options, hookable } = this.props;
+    if (hookable) {
       const Component = template as TemplateComponent;
       return items.map((item, index) => (
         <Component key={index} items={items} item={item} index={index} options={options} />
@@ -90,10 +90,10 @@ class ReactList extends Component<ReactListProps> {
   }
 
   get placeholderView() {
-    const { items, loading, templateEmpty, templateLoading, options, isJsx } = this.props;
+    const { items, loading, templateEmpty, templateLoading, options, hookable } = this.props;
     const emptyArgs = { items, item: null, index: -1, options };
     const isLoadingTemplate = typeof loading === 'boolean' && loading;
-    if (isJsx) {
+    if (hookable) {
       const Component = isLoadingTemplate
         ? (templateLoading as TemplateComponent)
         : (templateEmpty as TemplateComponent);
@@ -106,7 +106,7 @@ class ReactList extends Component<ReactListProps> {
     const {
       className,
       allowEmpty,
-      isJsx,
+      hookable,
       as,
       items,
       template,
