@@ -13,6 +13,8 @@ export interface TemplateArgs {
   options?: any;
 }
 
+// @reference https://github.com/copilot/c/d647b1d0-18b4-4503-8991-358b9387b7a0
+
 export interface ReactListProps {
   /**
    * Whether to allow empty list.
