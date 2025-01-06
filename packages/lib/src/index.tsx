@@ -1,7 +1,6 @@
 import noop from '@jswork/noop';
 import cx from 'classnames';
-import React, { Component, Fragment, ReactNode } from 'react';
-import classImperativeHandle from '@jswork/class-imperative-handle';
+import React, { Fragment, ReactNode, useImperativeHandle, forwardRef } from 'react';
 
 const CLASS_NAME = 'react-list';
 export type TemplateCallback = (args: TemplateArgs) => ReactNode;
@@ -65,80 +64,51 @@ export interface ReactListProps {
   forwardedRef?: any;
 }
 
-class ReactList extends Component<ReactListProps> {
-  static displayName = CLASS_NAME;
-  static version = '__VERSION__';
-  static defaultProps = {
-    hookable: false,
-    allowEmpty: false,
-    items: [],
-    sizeKey: 'length',
-    as: Fragment,
-    template: noop,
-    templateEmpty: noop,
-  };
+const ReactList: React.FC<ReactListProps> = forwardRef((props, ref) => {
+  const {
+    allowEmpty = false,
+    items = [],
+    loading,
+    hookable = false,
+    template = noop,
+    templateEmpty = noop,
+    templateLoading,
+    className,
+    as = Fragment,
+    options,
+    sizeKey = 'length',
+    forwardedRef,
+    ...restProps
+  } = props;
 
-  get children() {
-    const { items, template, options, hookable } = this.props;
-    if (hookable) {
+  useImperativeHandle(ref, () => forwardedRef);
+
+  const children = hookable
+    ? items.map((item, index) => {
       const Component = template as TemplateComponent;
-      return items.map((item, index) => (
-        <Component key={index} items={items} item={item} index={index} options={options} />
-      ));
-    }
-    return items.map((item, index) => template!({ items, item, index, options }));
-  }
+      return <Component key={index} items={items} item={item} index={index} options={options} />;
+    })
+    : items.map((item, index) => template!({ items, item, index, options }));
 
-  get placeholderView() {
-    const { items, loading, templateEmpty, templateLoading, options, hookable } = this.props;
-    const emptyArgs = { items, item: null, index: -1, options };
-    const isLoadingTemplate = typeof loading === 'boolean' && loading;
-    if (hookable) {
-      const Component = isLoadingTemplate
-        ? (templateLoading as TemplateComponent)
-        : (templateEmpty as TemplateComponent);
-      return <Component {...emptyArgs} />;
-    }
-    return isLoadingTemplate ? templateLoading?.(emptyArgs) : templateEmpty?.(emptyArgs);
-  }
+  const placeholderView = hookable
+    ? React.createElement(
+      loading ? (templateLoading as TemplateComponent) : (templateEmpty as TemplateComponent),
+      { items, item: null, index: -1, options },
+    )
+    : (loading ? templateLoading : templateEmpty)?.({ items, item: null, index: -1, options });
 
-  get properties() {
-    const {
-      className,
-      allowEmpty,
-      hookable,
-      as,
-      items,
-      template,
-      templateEmpty,
-      sizeKey,
-      forwardedRef,
-      options,
-      ...props
-    } = this.props;
+  const properties = as !== Fragment ? {
+    'data-component': CLASS_NAME,
+    ref: forwardedRef,
+    className: cx(CLASS_NAME, className),
+    ...restProps,
+  } : null;
 
-    if (as === Fragment) return null;
-
-    return {
-      'data-component': CLASS_NAME,
-      'ref': this.handleRef,
-      'className': cx(CLASS_NAME, className),
-      ...props,
-    };
-  }
-
-  handleRef = (inRoot: any) => {
-    const { forwardedRef } = this.props;
-    classImperativeHandle(forwardedRef, inRoot);
-  };
-
-  render() {
-    const { as, items, sizeKey, allowEmpty } = this.props;
-    if ((!items || !items[sizeKey!]) && !allowEmpty) return this.placeholderView;
-    return React.createElement(as, this.properties, this.children);
-  }
-}
-
-export default React.forwardRef((props: any, ref) => {
-  return <ReactList {...props} ref={ref} />;
+  if ((!items || !items[sizeKey]) && !allowEmpty) return placeholderView;
+  return React.createElement(as, properties, children);
 });
+
+ReactList.displayName = CLASS_NAME;
+// ReactList.version = '__VERSION__';
+
+export default ReactList;
