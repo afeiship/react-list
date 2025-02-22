@@ -1,6 +1,6 @@
 import noop from '@jswork/noop';
 import cx from 'classnames';
-import React, { Fragment, ReactNode, forwardRef } from 'react';
+import React, { Fragment, ReactNode } from 'react';
 
 const CLASS_NAME = 'react-list';
 export type TemplateCallback = (args: TemplateArgs) => ReactNode;
@@ -66,7 +66,7 @@ export interface ReactListProps {
   forwardedRef?: any;
 }
 
-const ReactList: React.FC<ReactListProps> = forwardRef((props) => {
+const ReactList: React.FC<ReactListProps> = (props) => {
   const {
     allowEmpty = false,
     items = [],
@@ -109,7 +109,7 @@ const ReactList: React.FC<ReactListProps> = forwardRef((props) => {
 
   if ((!items || !items[sizeKey]) && !allowEmpty) return placeholderView;
   return React.createElement(as, properties, children);
-});
+};
 
 ReactList.displayName = CLASS_NAME;
 // ReactList.version = '__VERSION__';
