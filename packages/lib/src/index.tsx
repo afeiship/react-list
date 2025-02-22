@@ -1,6 +1,6 @@
 import noop from '@jswork/noop';
 import cx from 'classnames';
-import React, { Fragment, ReactNode, useImperativeHandle, forwardRef } from 'react';
+import React, { Fragment, ReactNode, forwardRef } from 'react';
 
 const CLASS_NAME = 'react-list';
 export type TemplateCallback = (args: TemplateArgs) => ReactNode;
@@ -66,7 +66,7 @@ export interface ReactListProps {
   forwardedRef?: any;
 }
 
-const ReactList: React.FC<ReactListProps> = forwardRef((props, ref) => {
+const ReactList: React.FC<ReactListProps> = forwardRef((props) => {
   const {
     allowEmpty = false,
     items = [],
@@ -83,7 +83,8 @@ const ReactList: React.FC<ReactListProps> = forwardRef((props, ref) => {
     ...restProps
   } = props;
 
-  useImperativeHandle(ref, () => forwardedRef);
+  // will treats as clien side render, so forwardRef is not needed.
+  // useImperativeHandle(ref, () => forwardedRef);
 
   const children = hookable
     ? items.map((item, index) => {
