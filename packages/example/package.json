@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@jswork/react-list": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -18,7 +19,6 @@
     "@jswork/next": "^1.2.2",
     "@jswork/next-replace-in-file": "^1.0.0",
     "@jswork/presets-tailwind": "^1.0.33",
-    "@jswork/react-list": "^1.0.0",
     "@jswork/simple-date-format": "^1.0.5",
     "@jswork/style-guide": "^1.0.1",
     "@types/react": "^18.2.15",

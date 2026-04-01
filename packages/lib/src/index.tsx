@@ -1,117 +1,260 @@
-import noop from '@jswork/noop';
-import cx from 'classnames';
-import React, { Fragment, ReactNode } from 'react';
+import React from 'react';
 
-const CLASS_NAME = 'react-list';
-export type TemplateCallback = (args: TemplateArgs) => ReactNode;
-export type TemplateComponent = React.FC<TemplateArgs>;
+/**
+ * Represents a slot that can be either a component, a React node, or a component with default props.
+ *
+ * @typeParam P - The props type that the slot component accepts.
+ *
+ * @example
+ * ```tsx
+ * // Using a component directly
+ * const slot: Slot<{ name: string }> = MyComponent;
+ *
+ * // Using a React node directly
+ * const slotNode: Slot<{ name: string }> = <div>Hello</div>;
+ *
+ * // Using a component with default props
+ * const slotWithProps: Slot<{ name: string }> = {
+ *   component: MyComponent,
+ *   props: { name: 'Default' }
+ * };
+ * ```
+ */
+export type Slot<P = {}> =
+  | React.ComponentType<P>
+  | React.ReactNode
+  | {
+      /**
+       * The component to render.
+       */
+      component: React.ComponentType<P>;
+      /**
+       * Default props to merge with the provided props.
+       */
+      props?: Partial<P>;
+    };
 
-export interface TemplateArgs {
-  items: any[];
-  item: any;
-  index: number;
-  options?: any;
+/**
+ * Props for the {@link ReactList} component.
+ *
+ * @typeParam T - The type of items in the data array.
+ */
+export interface ReactListProps<T> {
+  /**
+   * The array of data items to render.
+   */
+  data: T[];
+
+  /**
+   * Extracts a unique key for each item in the list.
+   *
+   * Can be specified as:
+   * - A key of the item type (`keyof T`)
+   * - A function that receives the item and index, returning a string or number
+   *
+   * @example
+   * ```tsx
+   * // Using a key path
+   * <ReactList data={items} keyExtractor="id" {...props} />
+   *
+   * // Using a function
+   * <ReactList
+   *   data={items}
+   *   keyExtractor={(item, index) => item.id}
+   *   {...props}
+   * />
+   * ```
+   */
+  keyExtractor: keyof T | ((item: T, index: number) => string | number);
+
+  /**
+   * Slot configuration for rendering different list states.
+   */
+  slots: {
+    /**
+     * Slot for rendering each item in the list.
+     * Receives the current item, its index, and the full data array.
+     */
+    item: Slot<{
+      /** The current data item. */
+      item: T;
+      /** The index of the current item in the data array. */
+      index: number;
+      /** The complete data array. */
+      data: T[];
+    }>;
+    /**
+     * Optional slot for rendering the empty state.
+     * Receives the (empty) data array.
+     */
+    empty?: Slot<{
+      /** The (empty) data array. */
+      data: T[];
+    }>;
+  };
 }
 
-// @reference https://github.com/copilot/c/d647b1d0-18b4-4503-8991-358b9387b7a0
-
-export interface ReactListProps {
-  /**
-   * Whether to allow empty list.
-   */
-  allowEmpty?: boolean;
-  /**
-   * List data source.
-   */
-  items: any[];
-  /**
-   * Whether to display the loading status.
-   */
-  loading?: boolean;
-  /**
-   * If template can use react hook(as function component).
-   */
-  hookable?: boolean;
-  /**
-   * List item template.
-   */
-  template?: TemplateCallback | TemplateComponent;
-  /**
-   * Empty template.
-   */
-  templateEmpty?: TemplateCallback | TemplateComponent;
-  /**
-   * Loading template.
-   */
-  templateLoading?: TemplateCallback | TemplateComponent;
-  /**
-   * The extended className for component.
-   */
-  className?: string;
-  /**
-   * Use customize node name(tagName or ReactElement).
-   */
-  as?: any;
-  /**
-   * The extra options for template function.
-   */
-  options?: any;
-  /**
-   * The collection size key.
-   */
-  sizeKey?: string;
-  /**
-   * Reference to original ref instance(tag: dom).
-   */
-  forwardedRef?: any;
+/**
+ * Type guard to check if a value is a slot configuration object with component and props.
+ *
+ * @typeParam P - The props type for the slot component.
+ * @param value - The value to check.
+ * @returns `true` if the value is a slot configuration object.
+ */
+function isSlotConfig<P>(
+  value: any
+): value is { component: React.ComponentType<P>; props?: Partial<P> } {
+  return value && typeof value === 'object' && 'component' in value;
 }
 
-const ReactList: React.FC<ReactListProps> = (props) => {
-  const {
-    allowEmpty = false,
-    items = [],
-    loading,
-    hookable = false,
-    template = noop,
-    templateEmpty = noop,
-    templateLoading,
-    className,
-    as = Fragment,
-    options,
-    sizeKey = 'length',
-    forwardedRef,
-    ...restProps
-  } = props;
+/**
+ * Renders a slot by creating a React element from the slot definition.
+ *
+ * @template P - The props type for the slot component.
+ * @param slot - The slot definition to render.
+ * @param props - The props to pass to the slot component.
+ * @param key - Optional React key to add to the element.
+ * @returns A React node, or `null` if no slot is provided.
+ *
+ * @example
+ * ```tsx
+ * const slot = MyComponent;
+ * renderSlot(slot, { name: 'John' }); // => <MyComponent name="John" />
+ *
+ * const slotNode = <div>Hello</div>;
+ * renderSlot(slotNode, {}); // => <div>Hello</div>
+ *
+ * const slotWithProps = { component: MyComponent, props: { age: 30 } };
+ * renderSlot(slotWithProps, { name: 'John' }); // => <MyComponent age={30} name="John" />
+ * ```
+ */
+function renderSlot<P>(
+  slot: Slot<P> | undefined,
+  props: P,
+  key?: string | number
+): React.ReactNode {
+  if (!slot) return null;
 
-  // will treats as clien side render, so forwardRef is not needed.
-  // useImperativeHandle(ref, () => forwardedRef);
+  // Handle component function
+  if (typeof slot === 'function') {
+    return React.createElement(slot as any, key ? { key, ...props } : (props as any));
+  }
 
-  const children = hookable
-    ? items.map((item, index) => {
-      const Component = template as TemplateComponent;
-      return <Component key={index} items={items} item={item} index={index} options={options} />;
-    })
-    : items.map((item, index) => template!({ items, item, index, options }));
+  // Handle slot configuration with component and props
+  if (isSlotConfig<P>(slot)) {
+    return React.createElement(
+      slot.component as any,
+      {
+        key,
+        ...(slot.props ?? {}),
+        ...props,
+      } as any
+    );
+  }
 
-  const placeholderView = hookable
-    ? React.createElement(
-      loading ? (templateLoading as TemplateComponent) : (templateEmpty as TemplateComponent),
-      { items, item: null, index: -1, options },
-    )
-    : (loading ? templateLoading : templateEmpty)?.({ items, item: null, index: -1, options });
+  // Handle React.ReactNode (strings, numbers, JSX elements, etc.)
+  // Wrap in fragment to preserve key
+  if (key !== undefined) {
+    return <React.Fragment key={key}>{slot}</React.Fragment>;
+  }
+  return slot;
+}
 
-  const properties = as !== Fragment ? {
-    'data-component': CLASS_NAME,
-    ref: forwardedRef,
-    className: cx(CLASS_NAME, className),
-    ...restProps,
-  } : null;
+/**
+ * Extracts a unique key for a list item using the provided key extractor.
+ *
+ * @template T - The type of the data item.
+ * @param item - The data item.
+ * @param index - The index of the item in the array.
+ * @param keyExtractor - The key extractor function or property key.
+ * @returns A unique key (string or number) for the item.
+ *
+ * @example
+ * ```tsx
+ * getKey({ id: 1, name: 'Item' }, 0, 'id'); // => 1
+ * getKey({ id: 1, name: 'Item' }, 0, (item) => item.id); // => 1
+ * getKey({ name: 'Item' }, 0, 'id'); // => 0 (fallback to index)
+ * ```
+ */
+function getKey<T>(
+  item: T,
+  index: number,
+  keyExtractor: ReactListProps<T>['keyExtractor']
+): string | number {
+  if (typeof keyExtractor === 'function') {
+    return keyExtractor(item, index);
+  }
+  return (item[keyExtractor] ?? index) as string | number;
+}
 
-  if ((!items || !items[sizeKey]) && !allowEmpty) return placeholderView;
-  return React.createElement(as, properties, children);
-};
+/**
+ * A highly abstract, type-safe list component for React that renders data arrays
+ * using a slot-based architecture.
+ *
+ * @typeParam T - The type of items in the data array.
+ *
+ * @remarks
+ * `ReactList` provides a clean separation between data and presentation through
+ * its slot system. It automatically handles:
+ * - Rendering each item with its index and context
+ * - Displaying an empty state when data is empty
+ * - Flexible key extraction for optimal React reconciliation
+ *
+ * @example
+ * ```tsx
+ * interface User {
+ *   id: number;
+ *   name: string;
+ * }
+ *
+ * const ItemView = ({ item, index }: { item: User; index: number }) => (
+ *   <div>{index}: {item.name}</div>
+ * );
+ *
+ * const EmptyView = () => <div>No users found</div>;
+ *
+ * function UserList({ users }: { users: User[] }) {
+ *   return (
+ *     <ReactList
+ *       data={users}
+ *       keyExtractor="id"
+ *       slots={{
+ *         item: ItemView,
+ *         empty: EmptyView
+ *       }}
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Using slots with default props
+ * const slots = {
+ *   item: {
+ *     component: ItemView,
+ *     props: { className: 'list-item' }
+ *   }
+ * };
+ *
+ * <ReactList data={items} keyExtractor="id" slots={slots} />
+ * ```
+ */
+export function ReactList<T>({
+  data,
+  keyExtractor,
+  slots,
+}: ReactListProps<T>): React.ReactElement | null {
+  if (data.length === 0) {
+    return <>{renderSlot(slots.empty, { data })}</>;
+  }
 
-ReactList.displayName = CLASS_NAME;
-// ReactList.version = '__VERSION__';
-
-export default ReactList;
+  return (
+    <>
+      {data.map((item, index) => {
+        const key = getKey(item, index, keyExtractor);
+        return renderSlot(slots.item, { item, index, data }, key);
+      })}
+    </>
+  );
+}

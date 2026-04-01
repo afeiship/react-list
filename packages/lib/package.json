@@ -1,6 +1,6 @@
 {
   "name": "@jswork/react-list",
-  "version": "1.4.3",
+  "version": "2.0.0",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,6 @@
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "postsass -s src/style.scss -d dist/style.css -c",
     "release": "release-it --ci"
   },
   "devDependencies": {
