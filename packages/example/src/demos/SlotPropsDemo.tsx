@@ -9,6 +9,7 @@ import { useState } from 'react';
 interface ProductItemProps {
   item: typeof products[0];
   index: number;
+  data: typeof products;
   variant?: 'simple' | 'detailed';
   showCategory?: boolean;
 }
@@ -80,13 +81,13 @@ export function SlotPropsDemo() {
           slots={{
             item: useSimpleVariant
               ? productSlot
-              : {
+              : ({
                   component: ProductItem,
                   props: {
                     variant: 'simple',
                     showCategory: false
                   }
-                }
+                } as Slot<ProductItemProps>)
           }}
         />
       </div>
