@@ -35,6 +35,13 @@ export type Slot<P = {}> =
     };
 
 /**
+ * Extracts a unique key or value from a data item.
+ *
+ * @typeParam T - The type of items in the data array.
+ */
+export type KeyExtractor<T> = keyof T | ((item: T, index: number) => string | number);
+
+/**
  * Props for the {@link ReactList} component.
  *
  * @typeParam T - The type of items in the data array.
@@ -65,7 +72,7 @@ export interface ReactListProps<T> {
    * />
    * ```
    */
-  keyExtractor: keyof T | ((item: T, index: number) => string | number);
+  keyExtractor: KeyExtractor<T>;
 
   /**
    * Slot configuration for rendering different list states.
@@ -101,7 +108,7 @@ export interface ReactListProps<T> {
  * @param value - The value to check.
  * @returns `true` if the value is a slot configuration object.
  */
-function isSlotConfig<P>(
+export function isSlotConfig<P>(
   value: any
 ): value is { component: React.ComponentType<P>; props?: Partial<P> } {
   return value && typeof value === 'object' && 'component' in value;
@@ -128,7 +135,7 @@ function isSlotConfig<P>(
  * renderSlot(slotWithProps, { name: 'John' }); // => <MyComponent age={30} name="John" />
  * ```
  */
-function renderSlot<P>(
+export function renderSlot<P>(
   slot: Slot<P> | undefined,
   props: P,
   key?: string | number
@@ -169,7 +176,7 @@ function renderSlot<P>(
  * getKey({ name: 'Item' }, 0, 'id'); // => 0 (fallback to index)
  * ```
  */
-function getKey<T>(
+export function getKey<T>(
   item: T,
   index: number,
   keyExtractor: ReactListProps<T>['keyExtractor']
