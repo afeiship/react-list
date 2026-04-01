@@ -1,0 +1,224 @@
+# React List
+
+> A highly abstract, type-safe list component for React with slot-based architecture.
+
+## Overview
+
+ReactList is a lightweight, performant list component that separates data from presentation through a flexible slot system. It handles key extraction, empty states, and provides type-safe rendering for any data type.
+
+## Important Notes for Agents
+
+- **Component location**: `./packages/lib/src/index.tsx`
+- **Package name**: `@jswork/react-list`
+- **Main exports**: `ReactList` (component), `ReactListProps` (interface), `Slot` (type)
+- **Type-safe generics**: Component uses `<T>` generic for data items
+- **No CSS included**: This is a headless component - you provide all styling
+- **Live demo**: https://afeiship.github.io/react-list/
+
+## Key Features
+
+- **Slot-based architecture** - Render items, empty states, and more with full control
+- **Type-safe generics** - Full TypeScript support for any data type
+- **Flexible key extraction** - Use property keys or custom functions
+- **Performance optimized** - Memoized key generation for large lists
+- **Zero dependencies** - Only requires React as peer dependency
+
+## Installation
+
+```bash
+npm install -S @jswork/react-list
+# or
+yarn add @jswork/react-list
+# or
+pnpm add @jswork/react-list
+```
+
+## Component API
+
+### ReactList Props
+
+```typescript
+interface ReactListProps<T> {
+  data: T[];
+  keyExtractor: keyof T | ((item: T, index: number) => string | number);
+  slots: {
+    item: Slot<{ item: T; index: number; data: T[] }>;
+    empty?: Slot<{ data: T[] }>;
+  };
+}
+```
+
+### Slot Type
+
+A slot can be:
+1. A React component: `MyComponent`
+2. A React node: `<div>Hello</div>`
+3. A component with default props: `{ component: MyComponent, props: { className: 'item' } }`
+
+## Usage Examples
+
+### Basic Usage
+
+```tsx
+import { ReactList } from '@jswork/react-list';
+
+interface User {
+  id: number;
+  name: string;
+}
+
+const ItemView = ({ item }: { item: User }) => (
+  <div>{item.name}</div>
+);
+
+function App() {
+  const users: User[] = [
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' }
+  ];
+
+  return (
+    <ReactList
+      data={users}
+      keyExtractor="id"
+      slots={{ item: ItemView }}
+    />
+  );
+}
+```
+
+### With Empty State
+
+```tsx
+const EmptyView = () => <div>No users found</div>;
+
+<ReactList
+  data={users}
+  keyExtractor="id"
+  slots={{
+    item: ItemView,
+    empty: EmptyView
+  }}
+/>
+```
+
+### Using Custom Key Extractor
+
+```tsx
+<ReactList
+  data={users}
+  keyExtractor={(item, index) => `user-${item.id}-${index}`}
+  slots={{ item: ItemView }}
+/>
+```
+
+### With Slot Props (Default Props)
+
+```tsx
+const slots = {
+  item: {
+    component: ItemView,
+    props: { className: 'list-item', variant: 'compact' }
+  }
+};
+
+<ReactList data={users} keyExtractor="id" slots={slots} />
+```
+
+### Using React Node Directly
+
+```tsx
+<ReactList
+  data={users}
+  keyExtractor="id"
+  slots={{
+    item: ({ item }) => <div className="user">{item.name}</div>
+  }}
+/>
+```
+
+### Interactive List with State
+
+```tsx
+function UserList() {
+  const [users, setUsers] = useState(initialUsers);
+
+  const handleRemove = (id: number) => {
+    setUsers(prev => prev.filter(u => u.id !== id));
+  };
+
+  return (
+    <ReactList
+      data={users}
+      keyExtractor="id"
+      slots={{
+        item: (props) => (
+          <UserItem
+            {...props}
+            onRemove={handleRemove}
+          />
+        ),
+        empty: () => <div>No users left</div>
+      }}
+    />
+  );
+}
+```
+
+## Component Patterns
+
+### Item Component Pattern
+
+```tsx
+// Define item component with expected props
+interface ItemProps {
+  item: YourDataType;
+  index: number;
+  data: YourDataType[];
+}
+
+const YourItem = ({ item, index }: ItemProps) => (
+  <div>{item.someField}</div>
+);
+```
+
+### Empty State Pattern
+
+```tsx
+interface EmptyProps {
+  data: YourDataType[];
+}
+
+const YourEmpty = ({ data }: EmptyProps) => (
+  <div>Empty state for {data.length} items</div>
+);
+```
+
+## Best Practices for Agents
+
+1. **Always provide `keyExtractor`** - It's required for React reconciliation
+2. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
+3. **Leverage generics** - The `<T>` type parameter ensures type safety
+4. **Use slots for default props** - Pass common props via slot configuration
+5. **Memoize item components** - Wrap item components with `React.memo` for performance
+6. **Handle empty states** - Always provide an empty slot for better UX
+
+## Project Structure
+
+```
+react-list/
+├── packages/
+│   ├── lib/
+│   │   └── src/
+│   │       └── index.tsx       # Main component
+│   └── example/
+│       └── src/
+│           ├── demos/          # Usage examples
+│           └── assets/         # Mock data
+├── llms.txt                    # This file
+└── README.md
+```
+
+## License
+
+MIT
