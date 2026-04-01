@@ -16,35 +16,35 @@ export const users: User[] = [
     name: 'Alice Johnson',
     email: 'alice.johnson@example.com',
     age: 28,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice'
+    avatar: 'https://randomuser.me/api/portraits/lego/1.jpg'
   },
   {
     id: 2,
     name: 'Bob Smith',
     email: 'bob.smith@example.com',
     age: 34,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob'
+    avatar: 'https://randomuser.me/api/portraits/lego/2.jpg'
   },
   {
     id: 3,
     name: 'Carol Williams',
     email: 'carol.williams@example.com',
     age: 25,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol'
+    avatar: 'https://randomuser.me/api/portraits/lego/3.jpg'
   },
   {
     id: 4,
     name: 'David Brown',
     email: 'david.brown@example.com',
     age: 42,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
+    avatar: 'https://randomuser.me/api/portraits/lego/4.jpg'
   },
   {
     id: 5,
     name: 'Eve Davis',
     email: 'eve.davis@example.com',
     age: 31,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eve'
+    avatar: 'https://randomuser.me/api/portraits/lego/5.jpg'
   }
 ];
 

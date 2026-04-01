@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 /**
  * Represents a slot that can be either a component, a React node, or a component with default props.
@@ -135,25 +135,18 @@ function renderSlot<P>(
 ): React.ReactNode {
   if (!slot) return null;
 
-  // Handle component function
   if (typeof slot === 'function') {
     return React.createElement(slot as any, key ? { key, ...props } : (props as any));
   }
 
-  // Handle slot configuration with component and props
   if (isSlotConfig<P>(slot)) {
-    return React.createElement(
-      slot.component as any,
-      {
-        key,
-        ...(slot.props ?? {}),
-        ...props,
-      } as any
-    );
+    return React.createElement(slot.component as any, {
+      key,
+      ...slot.props,
+      ...props,
+    } as any);
   }
 
-  // Handle React.ReactNode (strings, numbers, JSX elements, etc.)
-  // Wrap in fragment to preserve key
   if (key !== undefined) {
     return <React.Fragment key={key}>{slot}</React.Fragment>;
   }
@@ -199,6 +192,7 @@ function getKey<T>(
  * - Rendering each item with its index and context
  * - Displaying an empty state when data is empty
  * - Flexible key extraction for optimal React reconciliation
+ * - Performance optimization with memoized key generation
  *
  * @example
  * ```tsx
@@ -244,17 +238,24 @@ export function ReactList<T>({
   data,
   keyExtractor,
   slots,
-}: ReactListProps<T>): React.ReactElement | null {
+}: ReactListProps<T>) {
+  // Cache keys array for performance optimization.
+  // Essential for large lists, harmless for small ones.
+  const keys = useMemo(() => {
+    return data.map((item, index) => getKey(item, index, keyExtractor));
+  }, [data, keyExtractor]);
+
   if (data.length === 0) {
     return <>{renderSlot(slots.empty, { data })}</>;
   }
 
   return (
     <>
-      {data.map((item, index) => {
-        const key = getKey(item, index, keyExtractor);
-        return renderSlot(slots.item, { item, index, data }, key);
-      })}
+      {data.map((item, index) =>
+        renderSlot(slots.item, { item, index, data }, keys[index])
+      )}
     </>
   );
 }
+
+export default ReactList;
