@@ -14,6 +14,7 @@
     "docs": "cd packages/example && yarn run build",
     "postdocs": "cp -R packages/example/dist docs",
     "preln:build": "yarn run docs",
+    "ln:test": "cd packages/lib && yarn run test",
     "ln:build": "cd packages/lib && yarn run build",
     "ln:publish": "cd packages/lib && yarn run release"
   }
