@@ -64,4 +64,16 @@ describe('renderSlot', () => {
     const { container } = render(<>{result}</>);
     expect(container.textContent).toBe('blue');
   });
+
+  it('should let runtime props override slot config same-name props while merging others', () => {
+    const SlotComponent = ({ greeting, name }: { greeting: string; name: string }) => (
+      <span>
+        {greeting} {name}
+      </span>
+    );
+    const config = { component: SlotComponent, props: { greeting: 'Hi', name: 'Config' } };
+    const result = renderSlot(config, { greeting: 'Hello', name: 'Runtime' });
+    const { container } = render(<>{result}</>);
+    expect(container.textContent).toBe('Hello Runtime');
+  });
 });
