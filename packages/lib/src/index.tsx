@@ -26,12 +26,14 @@ export type Slot<P = {}> =
   | {
       /**
        * The component to render.
+       * Accepts P plus any additional custom props supplied via `props`.
        */
-      component: React.ComponentType<P>;
+      component: React.ComponentType<P & Record<string, any>>;
       /**
-       * Default props to merge with the provided props.
+       * Extra props to merge with the standard slot props.
+       * These are passed to the component alongside the default slot props.
        */
-      props?: Partial<P>;
+      props?: Record<string, any>;
     };
 
 /**

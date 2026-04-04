@@ -11,7 +11,7 @@
     ],
     "sourceMap": true,
     "allowJs": false,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "declaration": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
@@ -24,11 +24,14 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "src",
-    "public"
+    "public",
+    "vitest.config.ts",
+    "__tests__"
   ],
   "exclude": [
     "node_modules",

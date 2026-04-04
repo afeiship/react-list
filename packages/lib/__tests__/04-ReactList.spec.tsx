@@ -10,7 +10,7 @@
  * - 使用 slot config（带默认 props）渲染列表项
  * - 验证 default export 可正常使用
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ReactList from '../src';
 
@@ -122,6 +122,43 @@ describe('ReactList', () => {
     expect(screen.getByText('>> Alice')).toBeInTheDocument();
     expect(screen.getByText('>> Bob')).toBeInTheDocument();
     expect(screen.getByText('>> Charlie')).toBeInTheDocument();
+  });
+
+  it('should accept slot config with required extra props passed via props', () => {
+    const clickFn = vi.fn();
+    const handlers: Record<string, () => void> = {
+      item_1: clickFn,
+    };
+
+    const CardItem = ({
+      item,
+      handlers: cardHandlers,
+    }: {
+      item: User;
+      index: number;
+      data: User[];
+      handlers: Record<string, () => void>;
+    }) => (
+      <div data-testid="card" onClick={cardHandlers[`item_${item.id}`]}>
+        {item.name}
+      </div>
+    );
+
+    render(
+      <ReactList
+        data={users}
+        keyExtractor="id"
+        slots={{ item: { component: CardItem, props: { handlers } } }}
+      />
+    );
+
+    const cards = screen.getAllByTestId('card');
+    expect(cards).toHaveLength(3);
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+
+    // Simulate clicking the first item
+    fireEvent.click(cards[0]);
+    expect(clickFn).toHaveBeenCalled();
   });
 
   it('should work with default export', () => {

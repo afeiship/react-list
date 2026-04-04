@@ -26,7 +26,7 @@ describe('getKey', () => {
   });
 
   it('should extract key using a function', () => {
-    const extractor = (item: User, index: number) => item.id;
+    const extractor = (item: User) => item.id;
     expect(getKey(users[0], 0, extractor)).toBe(1);
   });
 
@@ -35,7 +35,7 @@ describe('getKey', () => {
   });
 
   it('should pass index to function extractor', () => {
-    const extractor = (item: User, index: number) => index * 10;
+    const extractor = (_: User, index: number) => index * 10;
     expect(getKey(users[1], 1, extractor)).toBe(10);
   });
 });
