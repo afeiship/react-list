@@ -27,8 +27,10 @@ export type Slot<P = {}> =
       /**
        * The component to render.
        * Accepts P plus any additional custom props supplied via `props`.
+       * Uses `any` because the component may require extra props
+       * that are provided at runtime via the `props` field.
        */
-      component: React.ComponentType<P & Record<string, any>>;
+      component: React.ComponentType<any>;
       /**
        * Extra props to merge with the standard slot props.
        * These are passed to the component alongside the default slot props.
@@ -112,7 +114,7 @@ export interface ReactListProps<T> {
  */
 export function isSlotConfig<P>(
   value: any
-): value is { component: React.ComponentType<P & Record<string, any>>; props?: Record<string, any> } {
+): value is { component: React.ComponentType<any>; props?: Record<string, any> } {
   return value && typeof value === 'object' && 'component' in value;
 }
 
