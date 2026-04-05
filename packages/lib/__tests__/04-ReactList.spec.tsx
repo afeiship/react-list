@@ -25,8 +25,17 @@ const users: User[] = [
   { id: 3, name: 'Charlie' },
 ];
 
-const ItemView = ({ item, index }: { item: User; index: number; data: User[] }) => (
-  <div data-testid="item">
+const ItemView = ({
+  item,
+  index,
+  color,
+}: {
+  item: User;
+  index: number;
+  data: User[];
+  color: string;
+}) => (
+  <div data-testid="item" style={{ backgroundColor: color }}>
     {index}: {item.name}
   </div>
 );
@@ -37,61 +46,33 @@ const EmptyView = ({ data }: { data: User[] }) => (
 
 describe('ReactList', () => {
   it('should render items using a component slot', () => {
-    render(
-      <ReactList
-        data={users}
-        keyExtractor="id"
-        slots={{ item: ItemView }}
-      />
-    );
+    render(<ReactList data={users} keyExtractor="id" slots={{ item: ItemView }} />);
     expect(screen.getByText('0: Alice')).toBeInTheDocument();
     expect(screen.getByText('1: Bob')).toBeInTheDocument();
     expect(screen.getByText('2: Charlie')).toBeInTheDocument();
   });
 
   it('should render items using a function keyExtractor', () => {
-    render(
-      <ReactList
-        data={users}
-        keyExtractor={(item) => item.id}
-        slots={{ item: ItemView }}
-      />
-    );
+    render(<ReactList data={users} keyExtractor={(item) => item.id} slots={{ item: ItemView }} />);
     expect(screen.getByText('0: Alice')).toBeInTheDocument();
     expect(screen.getByText('2: Charlie')).toBeInTheDocument();
   });
 
   it('should render empty slot when data is empty', () => {
-    render(
-      <ReactList
-        data={[]}
-        keyExtractor="id"
-        slots={{ item: ItemView, empty: EmptyView }}
-      />
-    );
+    render(<ReactList data={[]} keyExtractor="id" slots={{ item: ItemView, empty: EmptyView }} />);
     expect(screen.getByTestId('empty')).toBeInTheDocument();
     expect(screen.getByText(/No items found/)).toBeInTheDocument();
   });
 
   it('should render nothing when data is empty and no empty slot', () => {
     const { container } = render(
-      <ReactList
-        data={[] as User[]}
-        keyExtractor="id"
-        slots={{ item: ItemView }}
-      />
+      <ReactList data={[] as User[]} keyExtractor="id" slots={{ item: ItemView }} />
     );
     expect(container.innerHTML).toBe('');
   });
 
   it('should render items using a ReactNode slot', () => {
-    render(
-      <ReactList
-        data={users}
-        keyExtractor="id"
-        slots={{ item: <span>static</span> }}
-      />
-    );
+    render(<ReactList data={users} keyExtractor="id" slots={{ item: <span>static</span> }} />);
     const items = screen.getAllByText('static');
     expect(items).toHaveLength(3);
   });
@@ -166,7 +147,14 @@ describe('ReactList', () => {
       <ReactList
         data={[{ id: 1, name: 'Test' }]}
         keyExtractor="id"
-        slots={{ item: ItemView }}
+        slots={{
+          item: {
+            component: ItemView,
+            props: {
+              color: 'red',
+            },
+          },
+        }}
       />
     );
     expect(screen.getByText('0: Test')).toBeInTheDocument();

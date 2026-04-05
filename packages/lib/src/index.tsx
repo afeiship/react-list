@@ -112,7 +112,7 @@ export interface ReactListProps<T> {
  */
 export function isSlotConfig<P>(
   value: any
-): value is { component: React.ComponentType<P>; props?: Partial<P> } {
+): value is { component: React.ComponentType<P & Record<string, any>>; props?: Record<string, any> } {
   return value && typeof value === 'object' && 'component' in value;
 }
 
