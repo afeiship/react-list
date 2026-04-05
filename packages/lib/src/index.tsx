@@ -112,7 +112,7 @@ export interface ReactListProps<T> {
  * @param value - The value to check.
  * @returns `true` if the value is a slot configuration object.
  */
-export function isSlotConfig<P>(
+export function isSlotConfig(
   value: any
 ): value is { component: React.ComponentType<any>; props?: Record<string, any> } {
   return value && typeof value === 'object' && 'component' in value;
@@ -150,7 +150,7 @@ export function renderSlot<P>(
     return React.createElement(slot as any, key ? { key, ...props } : (props as any));
   }
 
-  if (isSlotConfig<P>(slot)) {
+  if (isSlotConfig(slot)) {
     return React.createElement(slot.component as any, {
       key,
       ...slot.props,
