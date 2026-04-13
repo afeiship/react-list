@@ -142,6 +142,13 @@ describe('ReactList', () => {
     expect(clickFn).toHaveBeenCalled();
   });
 
+  it('should use "id" as default keyExtractor when not provided', () => {
+    render(<ReactList data={users} slots={{ item: ItemView }} />);
+    expect(screen.getByText('0: Alice')).toBeInTheDocument();
+    expect(screen.getByText('1: Bob')).toBeInTheDocument();
+    expect(screen.getByText('2: Charlie')).toBeInTheDocument();
+  });
+
   it('should work with default export', () => {
     render(
       <ReactList

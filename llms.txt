@@ -40,7 +40,7 @@ pnpm add @jswork/react-list
 ```typescript
 interface ReactListProps<T> {
   data: T[];
-  keyExtractor: keyof T | ((item: T, index: number) => string | number);
+  keyExtractor?: keyof T | ((item: T, index: number) => string | number); // default: "id"
   slots: {
     item: Slot<{ item: T; index: number; data: T[] }>;
     empty?: Slot<{ data: T[] }>;
@@ -196,7 +196,7 @@ const YourEmpty = ({ data }: EmptyProps) => (
 
 ## Best Practices for Agents
 
-1. **Always provide `keyExtractor`** - It's required for React reconciliation
+1. **`keyExtractor` defaults to `"id"`** - Only specify when your key field differs from `id`
 2. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
 3. **Leverage generics** - The `<T>` type parameter ensures type safety
 4. **Use slots for default props** - Pass common props via slot configuration

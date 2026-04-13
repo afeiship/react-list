@@ -76,7 +76,7 @@ export interface ReactListProps<T> {
    * />
    * ```
    */
-  keyExtractor: KeyExtractor<T>;
+  keyExtractor?: KeyExtractor<T>;
 
   /**
    * Slot configuration for rendering different list states.
@@ -247,7 +247,7 @@ export function getKey<T>(
  */
 export function ReactList<T>({
   data,
-  keyExtractor,
+  keyExtractor = 'id' as KeyExtractor<T>,
   slots,
 }: ReactListProps<T>) {
   // Cache keys array for performance optimization.
