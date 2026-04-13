@@ -183,7 +183,7 @@ export function renderSlot<P>(
 export function getKey<T>(
   item: T,
   index: number,
-  keyExtractor: ReactListProps<T>['keyExtractor']
+  keyExtractor: KeyExtractor<T>
 ): string | number {
   if (typeof keyExtractor === 'function') {
     return keyExtractor(item, index);
