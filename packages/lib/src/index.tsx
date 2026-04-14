@@ -58,13 +58,27 @@ export type Slot<P = {}> =
     };
 
 /**
+ * The context object passed to item-related callbacks (slot props and keyExtractor functions).
+ *
+ * @typeParam T - The type of items in the data array.
+ */
+export type ItemContext<T> = {
+  /** The current data item. */
+  item: T;
+  /** The index of the current item in the data array. */
+  index: number;
+  /** The complete data array. */
+  data: T[];
+};
+
+/**
  * Extracts a unique key or value from a data item.
  *
  * Can be specified as:
  * - `SELF` — use the item itself as the key (for primitive arrays)
  * - A key of the item type (`keyof T`)
  * - A dot-separated path to a nested property (e.g., `'user.address.city'`)
- * - A function that receives the item and index
+ * - A function that receives an {@link ItemContext} object
  *
  * @typeParam T - The type of items in the data array.
  */
@@ -72,7 +86,7 @@ export type KeyExtractor<T> =
   | typeof SELF
   | keyof T
   | string
-  | ((item: T, index: number) => Key);
+  | ((ctx: ItemContext<T>) => Key);
 
 /**
  * Props for the {@link ReactList} component.
@@ -110,7 +124,7 @@ export interface ReactListProps<T> {
    * // Using a function
    * <ReactList
    *   data={items}
-   *   keyExtractor={(item, index) => item.id}
+   *   keyExtractor={({ item }) => item.id}
    *   {...props}
    * />
    * ```
@@ -125,14 +139,7 @@ export interface ReactListProps<T> {
      * Slot for rendering each item in the list.
      * Receives the current item, its index, and the full data array.
      */
-    item: Slot<{
-      /** The current data item. */
-      item: T;
-      /** The index of the current item in the data array. */
-      index: number;
-      /** The complete data array. */
-      data: T[];
-    }>;
+    item: Slot<ItemContext<T>>;
     /**
      * Optional slot for rendering the empty state.
      * Receives the (empty) data array.
@@ -209,25 +216,27 @@ export function renderSlot<P>(
  * @template T - The type of the data item.
  * @param item - The data item.
  * @param index - The index of the item in the array.
+ * @param data - The complete data array.
  * @param keyExtractor - The key extractor: `SELF`, a property key, a dot path, or a function.
  * @returns A unique key (string or number) for the item.
  *
  * @example
  * ```tsx
- * getKey({ id: 1, name: 'Item' }, 0, 'id'); // => 1
- * getKey({ id: 1, name: 'Item' }, 0, (item) => item.id); // => 1
- * getKey({ name: 'Item' }, 0, 'id'); // => 0 (fallback to index)
- * getKey('apple', 0, SELF); // => 'apple'
- * getKey({ user: { id: 1 } }, 0, 'user.id'); // => 1
+ * getKey({ id: 1, name: 'Item' }, 0, [], 'id'); // => 1
+ * getKey({ id: 1, name: 'Item' }, 0, [], ({ item }) => item.id); // => 1
+ * getKey({ name: 'Item' }, 0, [], 'id'); // => 0 (fallback to index)
+ * getKey('apple', 0, [], SELF); // => 'apple'
+ * getKey({ user: { id: 1 } }, 0, [], 'user.id'); // => 1
  * ```
  */
 export function getKey<T>(
   item: T,
   index: number,
+  data: T[],
   keyExtractor: KeyExtractor<T>
 ): Key {
   if (typeof keyExtractor === 'function') {
-    return keyExtractor(item, index);
+    return keyExtractor({ item, index, data });
   }
   if (keyExtractor === SELF) {
     return item as unknown as Key;
@@ -303,7 +312,7 @@ export function ReactList<T>({
   // Cache keys array for performance optimization.
   // Essential for large lists, harmless for small ones.
   const keys = useMemo(() => {
-    return data.map((item, index) => getKey(item, index, keyExtractor));
+    return data.map((item, index) => getKey(item, index, data, keyExtractor));
   }, [data, keyExtractor]);
 
   if (data.length === 0) {

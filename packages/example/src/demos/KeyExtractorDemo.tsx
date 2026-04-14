@@ -40,7 +40,7 @@ export function KeyExtractorDemo() {
       <div className="space-y-2">
         <ReactList
           data={todos}
-          keyExtractor={(item) => item.uuid}
+          keyExtractor={({ item }) => item.uuid}
           slots={{
             item: TodoItem
           }}

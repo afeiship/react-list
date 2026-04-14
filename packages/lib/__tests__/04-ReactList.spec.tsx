@@ -53,7 +53,7 @@ describe('ReactList', () => {
   });
 
   it('should render items using a function keyExtractor', () => {
-    render(<ReactList data={users} keyExtractor={(item) => item.id} slots={{ item: ItemView }} />);
+    render(<ReactList data={users} keyExtractor={({ item }) => item.id} slots={{ item: ItemView }} />);
     expect(screen.getByText('0: Alice')).toBeInTheDocument();
     expect(screen.getByText('2: Charlie')).toBeInTheDocument();
   });
