@@ -10,7 +10,7 @@ ReactList is a lightweight, performant list component that separates data from p
 
 - **Component location**: `./packages/lib/src/index.tsx`
 - **Package name**: `@jswork/react-list`
-- **Main exports**: `ReactList` (component), `ReactListProps` (interface), `Slot` (type)
+- **Main exports**: `ReactList` (component), `ReactListProps` (interface), `Slot` (type), `SELF` (symbol), `KeyExtractor` (type)
 - **Type-safe generics**: Component uses `<T>` generic for data items
 - **No CSS included**: This is a headless component - you provide all styling
 - **Live demo**: https://afeiship.github.io/react-list/
@@ -19,7 +19,7 @@ ReactList is a lightweight, performant list component that separates data from p
 
 - **Slot-based architecture** - Render items, empty states, and more with full control
 - **Type-safe generics** - Full TypeScript support for any data type
-- **Flexible key extraction** - Use property keys or custom functions
+- **Flexible key extraction** - Use property keys, dot paths, SELF symbol, or custom functions
 - **Performance optimized** - Memoized key generation for large lists
 - **Zero dependencies** - Only requires React as peer dependency
 
@@ -40,7 +40,7 @@ pnpm add @jswork/react-list
 ```typescript
 interface ReactListProps<T> {
   data: T[];
-  keyExtractor?: keyof T | ((item: T, index: number) => string | number); // default: "id"
+  keyExtractor?: typeof SELF | keyof T | string | ((item: T, index: number) => string | number); // default: "id"
   slots: {
     item: Slot<{ item: T; index: number; data: T[] }>;
     empty?: Slot<{ data: T[] }>;
@@ -108,6 +108,28 @@ const EmptyView = () => <div>No users found</div>;
 <ReactList
   data={users}
   keyExtractor={(item, index) => `user-${item.id}-${index}`}
+  slots={{ item: ItemView }}
+/>
+```
+
+### Using SELF for Primitive Arrays
+
+```tsx
+import { ReactList, SELF } from '@jswork/react-list';
+
+<ReactList
+  data={['apple', 'banana', 'cherry']}
+  keyExtractor={SELF}
+  slots={{ item: ({ item }) => <div>{item}</div> }}
+/>
+```
+
+### Using Dot Path for Nested Properties
+
+```tsx
+<ReactList
+  data={users}
+  keyExtractor="profile.address.city"
   slots={{ item: ItemView }}
 />
 ```
@@ -197,7 +219,9 @@ const YourEmpty = ({ data }: EmptyProps) => (
 ## Best Practices for Agents
 
 1. **`keyExtractor` defaults to `"id"`** - Only specify when your key field differs from `id`
-2. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
+2. **Use `SELF` for primitive arrays** - `keyExtractor={SELF}` when items are strings or numbers
+3. **Use dot paths for nested data** - `keyExtractor="user.address.city"` extracts deep keys
+4. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
 3. **Leverage generics** - The `<T>` type parameter ensures type safety
 4. **Use slots for default props** - Pass common props via slot configuration
 5. **Memoize item components** - Wrap item components with `React.memo` for performance

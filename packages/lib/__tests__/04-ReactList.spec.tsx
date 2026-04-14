@@ -12,7 +12,7 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ReactList from '../src';
+import ReactList, { SELF } from '../src';
 
 interface User {
   id: number;
@@ -165,5 +165,40 @@ describe('ReactList', () => {
       />
     );
     expect(screen.getByText('0: Test')).toBeInTheDocument();
+  });
+
+  it('should render primitive arrays using SELF keyExtractor', () => {
+    const StringItem = ({ item }: { item: string }) => <div>{item}</div>;
+    render(
+      <ReactList
+        data={['apple', 'banana', 'cherry']}
+        keyExtractor={SELF}
+        slots={{ item: StringItem }}
+      />
+    );
+    expect(screen.getByText('apple')).toBeInTheDocument();
+    expect(screen.getByText('banana')).toBeInTheDocument();
+    expect(screen.getByText('cherry')).toBeInTheDocument();
+  });
+
+  it('should render nested data using dot path keyExtractor', () => {
+    interface NestedUser {
+      id: number;
+      profile: { city: string };
+    }
+    const nestedUsers: NestedUser[] = [
+      { id: 1, profile: { city: 'Shanghai' } },
+      { id: 2, profile: { city: 'Beijing' } },
+    ];
+    const NestedItem = ({ item }: { item: NestedUser }) => <div>{item.profile.city}</div>;
+    render(
+      <ReactList
+        data={nestedUsers}
+        keyExtractor="profile.city"
+        slots={{ item: NestedItem }}
+      />
+    );
+    expect(screen.getByText('Shanghai')).toBeInTheDocument();
+    expect(screen.getByText('Beijing')).toBeInTheDocument();
   });
 });

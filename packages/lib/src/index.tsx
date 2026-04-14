@@ -1,6 +1,25 @@
 import React, { useMemo } from 'react';
 
 /**
+ * Symbol marker to indicate that the item itself should be used as the key.
+ * Use this for primitive arrays (string[], number[]) where each item is its own unique identifier.
+ *
+ * @example
+ * ```tsx
+ * import ReactList, { SELF } from 'react-list';
+ *
+ * <ReactList data={['apple', 'banana']} keyExtractor={SELF} slots={...} />
+ * ```
+ */
+export const SELF: unique symbol = Symbol('react-list/self');
+
+/**
+ * The type of React key value.
+ * @internal
+ */
+type Key = string | number;
+
+/**
  * Represents a slot that can be either a component, a React node, or a component with default props.
  *
  * @typeParam P - The props type that the slot component accepts.
@@ -41,9 +60,19 @@ export type Slot<P = {}> =
 /**
  * Extracts a unique key or value from a data item.
  *
+ * Can be specified as:
+ * - `SELF` — use the item itself as the key (for primitive arrays)
+ * - A key of the item type (`keyof T`)
+ * - A dot-separated path to a nested property (e.g., `'user.address.city'`)
+ * - A function that receives the item and index
+ *
  * @typeParam T - The type of items in the data array.
  */
-export type KeyExtractor<T> = keyof T | ((item: T, index: number) => string | number);
+export type KeyExtractor<T> =
+  | typeof SELF
+  | keyof T
+  | string
+  | ((item: T, index: number) => Key);
 
 /**
  * Props for the {@link ReactList} component.
@@ -60,13 +89,23 @@ export interface ReactListProps<T> {
    * Extracts a unique key for each item in the list.
    *
    * Can be specified as:
+   * - `SELF` — use the item itself as the key (for primitive arrays like `string[]` or `number[]`)
    * - A key of the item type (`keyof T`)
+   * - A dot-separated path to a nested property (e.g., `'user.address.city'`)
    * - A function that receives the item and index, returning a string or number
    *
    * @example
    * ```tsx
+   * import ReactList, { SELF } from 'react-list';
+   *
+   * // Using SELF for primitive arrays
+   * <ReactList data={['apple', 'banana']} keyExtractor={SELF} {...props} />
+   *
    * // Using a key path
    * <ReactList data={items} keyExtractor="id" {...props} />
+   *
+   * // Using a dot path for nested properties
+   * <ReactList data={items} keyExtractor="user.address.city" {...props} />
    *
    * // Using a function
    * <ReactList
@@ -142,7 +181,7 @@ export function isSlotConfig(
 export function renderSlot<P>(
   slot: Slot<P> | undefined,
   props: P,
-  key?: string | number
+  key?: Key
 ): React.ReactNode {
   if (!slot) return null;
 
@@ -170,7 +209,7 @@ export function renderSlot<P>(
  * @template T - The type of the data item.
  * @param item - The data item.
  * @param index - The index of the item in the array.
- * @param keyExtractor - The key extractor function or property key.
+ * @param keyExtractor - The key extractor: `SELF`, a property key, a dot path, or a function.
  * @returns A unique key (string or number) for the item.
  *
  * @example
@@ -178,17 +217,28 @@ export function renderSlot<P>(
  * getKey({ id: 1, name: 'Item' }, 0, 'id'); // => 1
  * getKey({ id: 1, name: 'Item' }, 0, (item) => item.id); // => 1
  * getKey({ name: 'Item' }, 0, 'id'); // => 0 (fallback to index)
+ * getKey('apple', 0, SELF); // => 'apple'
+ * getKey({ user: { id: 1 } }, 0, 'user.id'); // => 1
  * ```
  */
 export function getKey<T>(
   item: T,
   index: number,
   keyExtractor: KeyExtractor<T>
-): string | number {
+): Key {
   if (typeof keyExtractor === 'function') {
     return keyExtractor(item, index);
   }
-  return (item[keyExtractor] ?? index) as string | number;
+  if (keyExtractor === SELF) {
+    return item as unknown as Key;
+  }
+  // String: simple key or dot path
+  const segments = (keyExtractor as string).split('.');
+  let value: any = item;
+  for (const key of segments) {
+    value = value?.[key];
+  }
+  return (value ?? index) as Key;
 }
 
 /**

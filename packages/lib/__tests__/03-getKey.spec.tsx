@@ -7,7 +7,7 @@
  * - 属性不存在时回退到 index
  * - 函数接收正确的 item 和 index 参数
  */
-import { getKey } from '../src';
+import { getKey, SELF } from '../src';
 
 interface User {
   id: number;
@@ -37,5 +37,35 @@ describe('getKey', () => {
   it('should pass index to function extractor', () => {
     const extractor = (_: User, index: number) => index * 10;
     expect(getKey(users[1], 1, extractor)).toBe(10);
+  });
+
+  describe('SELF', () => {
+    it('should return item itself as key using SELF', () => {
+      expect(getKey('apple', 0, SELF)).toBe('apple');
+    });
+
+    it('should return number item itself as key using SELF', () => {
+      expect(getKey(42, 0, SELF)).toBe(42);
+    });
+  });
+
+  describe('dot path', () => {
+    const nested = { user: { profile: { city: 'Shanghai' } }, id: 1 };
+
+    it('should extract key using a dot path', () => {
+      expect(getKey(nested, 0, 'user.profile.city')).toBe('Shanghai');
+    });
+
+    it('should extract key using a single-level dot path (equivalent to keyof)', () => {
+      expect(getKey(nested, 0, 'id')).toBe(1);
+    });
+
+    it('should fallback to index when dot path resolves to undefined', () => {
+      expect(getKey(nested, 3, 'user.profile.country' as any)).toBe(3);
+    });
+
+    it('should fallback to index when intermediate path is null', () => {
+      expect(getKey({ user: null }, 7, 'user.name' as any)).toBe(7);
+    });
   });
 });
