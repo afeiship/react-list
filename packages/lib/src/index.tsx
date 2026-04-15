@@ -193,7 +193,7 @@ export function renderSlot<P>(
   if (!slot) return null;
 
   if (typeof slot === 'function') {
-    return React.createElement(slot as any, key ? { key, ...props } : (props as any));
+    return React.createElement(slot as any, key != null ? { key, ...props } : (props as any));
   }
 
   if (isSlotConfig(slot)) {

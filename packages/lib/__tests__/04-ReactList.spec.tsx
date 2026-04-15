@@ -181,6 +181,22 @@ describe('ReactList', () => {
     expect(screen.getByText('cherry')).toBeInTheDocument();
   });
 
+  it('should handle empty string items with SELF keyExtractor without key warning', () => {
+    const consoleWarn = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const StringItem = ({ item }: { item: string }) => <div>{item || '(empty)'}</div>;
+    render(
+      <ReactList
+        data={['abc', '']}
+        keyExtractor={SELF}
+        slots={{ item: StringItem }}
+      />
+    );
+    expect(screen.getByText('abc')).toBeInTheDocument();
+    expect(screen.getByText('(empty)')).toBeInTheDocument();
+    expect(consoleWarn).not.toHaveBeenCalled();
+    consoleWarn.mockRestore();
+  });
+
   it('should render nested data using dot path keyExtractor', () => {
     interface NestedUser {
       id: number;
