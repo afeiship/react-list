@@ -7,7 +7,7 @@
  * - 属性不存在时回退到 index
  * - 函数接收正确的 ItemContext（item, index, data）参数
  */
-import { getKey, SELF } from '../src';
+import { getKey, SELF, INDEX } from '../src';
 
 interface User {
   id: number;
@@ -51,6 +51,16 @@ describe('getKey', () => {
 
     it('should return number item itself as key using SELF', () => {
       expect(getKey(42, 0, [], SELF)).toBe(42);
+    });
+  });
+
+  describe('INDEX', () => {
+    it('should return index as key using INDEX', () => {
+      expect(getKey('apple', 0, [], INDEX)).toBe(0);
+    });
+
+    it('should return index for arbitrary items using INDEX', () => {
+      expect(getKey({ name: 'test' }, 5, [], INDEX)).toBe(5);
     });
   });
 

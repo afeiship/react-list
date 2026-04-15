@@ -14,6 +14,20 @@ import React, { useMemo } from 'react';
 export const SELF: unique symbol = Symbol('react-list/self');
 
 /**
+ * Symbol marker to indicate that the array index should be used as the key.
+ * Use this when items have no stable unique identifier and the list is static
+ * (not reordered, inserted, or filtered).
+ *
+ * @example
+ * ```tsx
+ * import ReactList, { INDEX } from 'react-list';
+ *
+ * <ReactList data={['apple', 'banana']} keyExtractor={INDEX} slots={...} />
+ * ```
+ */
+export const INDEX: unique symbol = Symbol('react-list/index');
+
+/**
  * The type of React key value.
  * @internal
  */
@@ -76,6 +90,7 @@ export type ItemContext<T> = {
  *
  * Can be specified as:
  * - `SELF` — use the item itself as the key (for primitive arrays)
+ * - `INDEX` — use the array index as the key
  * - A key of the item type (`keyof T`)
  * - A dot-separated path to a nested property (e.g., `'user.address.city'`)
  * - A function that receives an {@link ItemContext} object
@@ -84,6 +99,7 @@ export type ItemContext<T> = {
  */
 export type KeyExtractor<T> =
   | typeof SELF
+  | typeof INDEX
   | keyof T
   | string
   | ((ctx: ItemContext<T>) => Key);
@@ -104,6 +120,7 @@ export interface ReactListProps<T> {
    *
    * Can be specified as:
    * - `SELF` — use the item itself as the key (for primitive arrays like `string[]` or `number[]`)
+   * - `INDEX` — use the array index as the key
    * - A key of the item type (`keyof T`)
    * - A dot-separated path to a nested property (e.g., `'user.address.city'`)
    * - A function that receives the item and index, returning a string or number
@@ -217,7 +234,7 @@ export function renderSlot<P>(
  * @param item - The data item.
  * @param index - The index of the item in the array.
  * @param data - The complete data array.
- * @param keyExtractor - The key extractor: `SELF`, a property key, a dot path, or a function.
+ * @param keyExtractor - The key extractor: `SELF`, `INDEX`, a property key, a dot path, or a function.
  * @returns A unique key (string or number) for the item.
  *
  * @example
@@ -226,6 +243,7 @@ export function renderSlot<P>(
  * getKey({ id: 1, name: 'Item' }, 0, [], ({ item }) => item.id); // => 1
  * getKey({ name: 'Item' }, 0, [], 'id'); // => 0 (fallback to index)
  * getKey('apple', 0, [], SELF); // => 'apple'
+ * getKey('apple', 0, [], INDEX); // => 0
  * getKey({ user: { id: 1 } }, 0, [], 'user.id'); // => 1
  * ```
  */
@@ -240,6 +258,9 @@ export function getKey<T>(
   }
   if (keyExtractor === SELF) {
     return item as unknown as Key;
+  }
+  if (keyExtractor === INDEX) {
+    return index;
   }
   // String: simple key or dot path
   const segments = (keyExtractor as string).split('.');

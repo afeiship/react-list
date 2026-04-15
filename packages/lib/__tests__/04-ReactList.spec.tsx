@@ -12,7 +12,7 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ReactList, { SELF } from '../src';
+import ReactList, { SELF, INDEX } from '../src';
 
 interface User {
   id: number;
@@ -195,6 +195,20 @@ describe('ReactList', () => {
     expect(screen.getByText('(empty)')).toBeInTheDocument();
     expect(consoleWarn).not.toHaveBeenCalled();
     consoleWarn.mockRestore();
+  });
+
+  it('should render items using INDEX keyExtractor', () => {
+    const StringItem = ({ item }: { item: string }) => <div>{item}</div>;
+    render(
+      <ReactList
+        data={['apple', 'banana', 'cherry']}
+        keyExtractor={INDEX}
+        slots={{ item: StringItem }}
+      />
+    );
+    expect(screen.getByText('apple')).toBeInTheDocument();
+    expect(screen.getByText('banana')).toBeInTheDocument();
+    expect(screen.getByText('cherry')).toBeInTheDocument();
   });
 
   it('should render nested data using dot path keyExtractor', () => {
