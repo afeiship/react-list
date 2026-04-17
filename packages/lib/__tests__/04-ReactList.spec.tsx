@@ -12,6 +12,7 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import React from 'react';
 import ReactList, { SELF, INDEX } from '../src';
 
 interface User {
@@ -230,5 +231,99 @@ describe('ReactList', () => {
     );
     expect(screen.getByText('Shanghai')).toBeInTheDocument();
     expect(screen.getByText('Beijing')).toBeInTheDocument();
+  });
+
+  describe('inline arrow function slot remount', () => {
+    it('should remount items when slot is an inline arrow function (new ref each render)', () => {
+      const mountTracker = vi.fn();
+
+      const InputItem = ({ item }: { item: User; index: number; data: User[] }) => {
+        React.useEffect(() => { mountTracker(item.id); }, []);
+        return (
+          <div>
+            <input data-testid={`input-${item.id}`} />
+            <span>{item.name}</span>
+          </div>
+        );
+      };
+
+      const { rerender } = render(
+        <ReactList
+          data={users}
+          keyExtractor="id"
+          slots={{ item: (props) => <InputItem {...props} /> }}
+        />
+      );
+
+      expect(mountTracker).toHaveBeenCalledTimes(3);
+
+      const firstInput = screen.getByTestId('input-1');
+      firstInput.focus();
+      expect(firstInput).toHaveFocus();
+
+      // Re-render creates a NEW inline arrow function → React sees different component type → remount
+      rerender(
+        <ReactList
+          data={users}
+          keyExtractor="id"
+          slots={{ item: (props) => <InputItem {...props} /> }}
+        />
+      );
+
+      // All items remounted: 3 initial + 3 after rerender
+      expect(mountTracker).toHaveBeenCalledTimes(6);
+
+      // Old input is gone (component was unmounted)
+      expect(firstInput).not.toBeInTheDocument();
+
+      // New input exists but has lost focus
+      const newInput = screen.getByTestId('input-1');
+      expect(newInput).not.toHaveFocus();
+    });
+
+    it('should preserve component state when slot ref is stable across renders', () => {
+      const mountTracker = vi.fn();
+
+      const InputItem = ({ item }: { item: User; index: number; data: User[] }) => {
+        React.useEffect(() => { mountTracker(item.id); }, []);
+        return (
+          <div>
+            <input data-testid={`input-${item.id}`} />
+            <span>{item.name}</span>
+          </div>
+        );
+      };
+
+      const stableSlot = (props: any) => <InputItem {...props} />;
+
+      const { rerender } = render(
+        <ReactList
+          data={users}
+          keyExtractor="id"
+          slots={{ item: stableSlot }}
+        />
+      );
+
+      expect(mountTracker).toHaveBeenCalledTimes(3);
+
+      const firstInput = screen.getByTestId('input-1');
+      firstInput.focus();
+      expect(firstInput).toHaveFocus();
+
+      // Re-render with the SAME function ref → React reuses component
+      rerender(
+        <ReactList
+          data={users}
+          keyExtractor="id"
+          slots={{ item: stableSlot }}
+        />
+      );
+
+      // No remounts
+      expect(mountTracker).toHaveBeenCalledTimes(3);
+
+      // Same DOM node, focus preserved
+      expect(firstInput).toHaveFocus();
+    });
   });
 });
