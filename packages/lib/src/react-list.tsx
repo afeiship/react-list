@@ -1,18 +1,13 @@
 import React, { useMemo } from 'react';
-import type { ReactListProps, ItemContext } from './types';
+import type { ReactListProps } from './types';
 import { renderSlot, getKey } from './utils';
 import type { KeyExtractor } from './types';
 
-type ReactListForwardRef = {
-  <T>(props: ReactListProps<T> & React.RefAttributes<ItemContext<T>[]>): React.ReactElement | null;
-};
-
-function ReactListInner<T>(
-  { data, keyExtractor = 'id' as KeyExtractor<T>, slots }: ReactListProps<T>,
-  ref: React.ForwardedRef<ItemContext<T>[]>
-) {
-  React.useImperativeHandle(ref, () => data.map((item, index) => ({ item, index, data })), [data]);
-
+export function ReactList<T>({
+  data,
+  keyExtractor = 'id' as KeyExtractor<T>,
+  slots,
+}: ReactListProps<T>) {
   const keys = useMemo(() => {
     return data.map((item, index) => getKey(item, index, data, keyExtractor));
   }, [data, keyExtractor]);
@@ -25,5 +20,3 @@ function ReactListInner<T>(
     <>{data.map((item, index) => renderSlot(slots.item, { item, index, data }, keys[index]))}</>
   );
 }
-
-export const ReactList = React.forwardRef(ReactListInner) as ReactListForwardRef;

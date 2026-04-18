@@ -8,7 +8,7 @@ ReactList is a lightweight, performant list component that separates data from p
 
 ## Important Notes for Agents
 
-- **Component location**: `./packages/lib/src/index.tsx`
+- **Component location**: `./packages/lib/src/react-list.tsx`
 - **Package name**: `@jswork/react-list`
 - **Main exports**: `ReactList` (component), `ReactListProps` (interface), `Slot` (type), `SELF` (symbol), `INDEX` (symbol), `KeyExtractor` (type), `ItemContext` (type)
 - **Type-safe generics**: Component uses `<T>` generic for data items
@@ -233,12 +233,12 @@ const YourEmpty = ({ data }: EmptyProps) => (
 1. **`keyExtractor` defaults to `"id"`** - Only specify when your key field differs from `id`
 2. **Use `SELF` for primitive arrays** - `keyExtractor={SELF}` when items are strings or numbers
 3. **Use `INDEX` for index-based keys** - `keyExtractor={INDEX}` when items have no stable unique identifier
-3. **Use dot paths for nested data** - `keyExtractor="user.address.city"` extracts deep keys
-4. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
-3. **Leverage generics** - The `<T>` type parameter ensures type safety
-4. **Use slots for default props** - Pass common props via slot configuration
-5. **Memoize item components** - Wrap item components with `React.memo` for performance
-6. **Handle empty states** - Always provide an empty slot for better UX
+4. **Use dot paths for nested data** - `keyExtractor="user.address.city"` extracts deep keys
+5. **Use property keys when possible** - `keyExtractor="id"` is simpler than a function
+6. **Leverage generics** - The `<T>` type parameter ensures type safety
+7. **Use slots for default props** - Pass common props via slot configuration
+8. **Memoize item components** - Wrap item components with `React.memo` for performance
+9. **Handle empty states** - Always provide an empty slot for better UX
 
 ## Project Structure
 
@@ -247,7 +247,10 @@ react-list/
 ├── packages/
 │   ├── lib/
 │   │   └── src/
-│   │       └── index.tsx       # Main component
+│   │       ├── types.ts         # Types & symbols (SELF, INDEX, Slot, ItemContext, etc.)
+│   │       ├── utils.tsx        # Utilities (isSlotConfig, renderSlot, getKey)
+│   │       ├── react-list.tsx   # ReactList component
+│   │       └── index.tsx        # Re-exports
 │   └── example/
 │       └── src/
 │           ├── demos/          # Usage examples
