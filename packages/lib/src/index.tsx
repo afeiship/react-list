@@ -184,6 +184,24 @@ export function isSlotConfig(
 /**
  * Attaches a React key to a rendered result via `cloneElement`.
  *
+ * Unlike `createElement`, which treats the slot function itself as the component
+ * type, `cloneElement` operates on the *returned* element. This distinction is
+ * critical for inline arrow function slots:
+ *
+ * ```tsx
+ * // Each render creates a NEW arrow function reference
+ * <ReactList slots={{ item: (props) => <InputItem {...props} /> }} />
+ * ```
+ *
+ * With `createElement(slot, props)`, React sees a different component type on every
+ * render (new function reference) and unmounts/remounts the entire subtree. This
+ * destroys local DOM state — an `<input>` loses focus, animations reset, scroll
+ * position jumps, etc.
+ *
+ * By calling the slot function first and then using `cloneElement` on the result,
+ * the *actual* component (`InputItem`) remains the stable type across renders,
+ * so React performs a props-only update instead of a full remount.
+ *
  * @param result - The rendered React node to attach the key to.
  * @param key - Optional React key.
  */
