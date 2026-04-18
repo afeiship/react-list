@@ -226,9 +226,7 @@ export function renderSlot<P>(slot: Slot<P> | undefined, props: P, key?: Key): R
     return withKey((slot.component as any)({ ...slot.props, ...props }), key);
   }
 
-  return key != null
-    ? <React.Fragment key={key}>{slot}</React.Fragment>
-    : slot;
+  return key != null ? <React.Fragment key={key}>{slot}</React.Fragment> : slot;
 }
 
 /**
@@ -324,13 +322,16 @@ export function getKey<T>(item: T, index: number, data: T[], keyExtractor: KeyEx
  * <ReactList data={items} keyExtractor="id" slots={slots} />
  * ```
  */
-export function ReactList<T>({
-  data,
-  keyExtractor = 'id' as KeyExtractor<T>,
-  slots,
-}: ReactListProps<T>) {
-  // Cache keys array for performance optimization.
-  // Essential for large lists, harmless for small ones.
+type ReactListForwardRef = {
+  <T>(props: ReactListProps<T> & React.RefAttributes<ItemContext<T>[]>): React.ReactElement | null;
+};
+
+function ReactListInner<T>(
+  { data, keyExtractor = 'id' as KeyExtractor<T>, slots }: ReactListProps<T>,
+  ref: React.ForwardedRef<ItemContext<T>[]>
+) {
+  React.useImperativeHandle(ref, () => data.map((item, index) => ({ item, index, data })), [data]);
+
   const keys = useMemo(() => {
     return data.map((item, index) => getKey(item, index, data, keyExtractor));
   }, [data, keyExtractor]);
@@ -343,5 +344,7 @@ export function ReactList<T>({
     <>{data.map((item, index) => renderSlot(slots.item, { item, index, data }, keys[index]))}</>
   );
 }
+
+export const ReactList = React.forwardRef(ReactListInner) as ReactListForwardRef;
 
 export default ReactList;

@@ -324,5 +324,25 @@ describe('ReactList', () => {
       // Same DOM node, focus preserved
       expect(firstInput).toHaveFocus();
     });
+
+    it('should support ref via forwardRef', () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const ref = React.createRef<{ item: User; index: number; data: User[] }[]>();
+
+      render(
+        <ReactList
+          ref={ref}
+          data={users}
+          keyExtractor="id"
+          slots={{ item: ItemView }}
+        />
+      );
+
+      expect(consoleError).not.toHaveBeenCalled();
+      expect(ref.current).toHaveLength(3);
+      expect(ref.current![0]).toEqual({ item: users[0], index: 0, data: users });
+
+      consoleError.mockRestore();
+    });
   });
 });
