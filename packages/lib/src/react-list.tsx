@@ -13,10 +13,8 @@ export function ReactList<T>({
   }, [data, keyExtractor]);
 
   if (data.length === 0) {
-    return <>{renderSlot(slots.empty, { data })}</>;
+    return renderSlot(slots.empty, { data });
   }
 
-  return (
-    <>{data.map((item, index) => renderSlot(slots.item, { item, index, data }, keys[index]))}</>
-  );
+  return data.map((item, index) => renderSlot(slots.item, { item, index, data }, keys[index]));
 }
