@@ -182,6 +182,19 @@ export function isSlotConfig(
 }
 
 /**
+ * Attaches a React key to a rendered result via `cloneElement`.
+ *
+ * @param result - The rendered React node to attach the key to.
+ * @param key - Optional React key.
+ */
+function withKey(result: React.ReactNode, key?: Key): React.ReactNode {
+  if (key != null && React.isValidElement(result)) {
+    return React.cloneElement(result, { key });
+  }
+  return result;
+}
+
+/**
  * Renders a slot by creating a React element from the slot definition.
  *
  * @template P - The props type for the slot component.
@@ -202,29 +215,20 @@ export function isSlotConfig(
  * renderSlot(slotWithProps, { name: 'John' }); // => <MyComponent age={30} name="John" />
  * ```
  */
-export function renderSlot<P>(
-  slot: Slot<P> | undefined,
-  props: P,
-  key?: Key
-): React.ReactNode {
+export function renderSlot<P>(slot: Slot<P> | undefined, props: P, key?: Key): React.ReactNode {
   if (!slot) return null;
 
   if (typeof slot === 'function') {
-    return React.createElement(slot as any, key != null ? { key, ...props } : (props as any));
+    return withKey((slot as any)(props), key);
   }
 
   if (isSlotConfig(slot)) {
-    return React.createElement(slot.component as any, {
-      key,
-      ...slot.props,
-      ...props,
-    } as any);
+    return withKey((slot.component as any)({ ...slot.props, ...props }), key);
   }
 
-  if (key !== undefined) {
-    return <React.Fragment key={key}>{slot}</React.Fragment>;
-  }
-  return slot;
+  return key != null
+    ? <React.Fragment key={key}>{slot}</React.Fragment>
+    : slot;
 }
 
 /**
@@ -247,12 +251,7 @@ export function renderSlot<P>(
  * getKey({ user: { id: 1 } }, 0, [], 'user.id'); // => 1
  * ```
  */
-export function getKey<T>(
-  item: T,
-  index: number,
-  data: T[],
-  keyExtractor: KeyExtractor<T>
-): Key {
+export function getKey<T>(item: T, index: number, data: T[], keyExtractor: KeyExtractor<T>): Key {
   if (typeof keyExtractor === 'function') {
     return keyExtractor({ item, index, data });
   }
@@ -341,11 +340,7 @@ export function ReactList<T>({
   }
 
   return (
-    <>
-      {data.map((item, index) =>
-        renderSlot(slots.item, { item, index, data }, keys[index])
-      )}
-    </>
+    <>{data.map((item, index) => renderSlot(slots.item, { item, index, data }, keys[index]))}</>
   );
 }
 

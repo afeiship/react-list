@@ -261,7 +261,9 @@ describe('ReactList', () => {
       firstInput.focus();
       expect(firstInput).toHaveFocus();
 
-      // Re-render creates a NEW inline arrow function → React sees different component type → remount
+      // Re-render creates a NEW inline arrow function
+      // Since renderSlot calls the function directly (no createElement wrapper),
+      // items are NOT remounted — React reconciles the returned JSX directly.
       rerender(
         <ReactList
           data={users}
@@ -270,15 +272,12 @@ describe('ReactList', () => {
         />
       );
 
-      // All items remounted: 3 initial + 3 after rerender
-      expect(mountTracker).toHaveBeenCalledTimes(6);
+      // Items are NOT remounted: still only 3 mount calls
+      expect(mountTracker).toHaveBeenCalledTimes(3);
 
-      // Old input is gone (component was unmounted)
-      expect(firstInput).not.toBeInTheDocument();
-
-      // New input exists but has lost focus
-      const newInput = screen.getByTestId('input-1');
-      expect(newInput).not.toHaveFocus();
+      // Same input element still exists and retains focus
+      expect(firstInput).toBeInTheDocument();
+      expect(firstInput).toHaveFocus();
     });
 
     it('should preserve component state when slot ref is stable across renders', () => {
