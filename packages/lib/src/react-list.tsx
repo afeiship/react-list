@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { ReactListProps } from './types';
 import { renderSlot, getKey } from './utils';
 import type { KeyExtractor } from './types';
