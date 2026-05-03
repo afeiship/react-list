@@ -14,67 +14,51 @@ export function isSlotConfig(
 }
 
 /**
- * Attaches a React key to a rendered result via `cloneElement`.
+ * A stable bridge component that renders the slot via `createElement`.
+ * Defined at module level so its identity never changes across renders,
+ * preventing React from remounting the subtree when the parent re-renders.
+ *
+ * Each list item gets its own SlotBridge instance, so hooks inside the slot
+ * component run in a proper per-item React context (not the parent's).
+ * The slot is called directly (not via createElement) so the returned element
+ * retains its stable component type — inline arrow wrappers don't cause remounts.
+ *
  * @internal
- *
- * Unlike `createElement`, which treats the slot function itself as the component
- * type, `cloneElement` operates on the *returned* element. This distinction is
- * critical for inline arrow function slots:
- *
- * ```tsx
- * // Each render creates a NEW arrow function reference
- * <ReactList slots={{ item: (props) => <InputItem {...props} /> }} />
- * ```
- *
- * With `createElement(slot, props)`, React sees a different component type on every
- * render (new function reference) and unmounts/remounts the entire subtree. This
- * destroys local DOM state — an `<input>` loses focus, animations reset, scroll
- * position jumps, etc.
- *
- * By calling the slot function first and then using `cloneElement` on the result,
- * the *actual* component (`InputItem`) remains the stable type across renders,
- * so React performs a props-only update instead of a full remount.
- *
- * @param result - The rendered React node to attach the key to.
- * @param key - Optional React key.
  */
-function withKey(result: React.ReactNode, key?: Key): React.ReactNode {
-  if (key != null && React.isValidElement(result)) {
-    return React.cloneElement(result, { key });
+function SlotBridge<P>(bridgeProps: { _slot: Slot<P>; _slotProps: P }) {
+  const { _slot, _slotProps } = bridgeProps;
+  if (typeof _slot === 'function') {
+    return (_slot as any)(_slotProps);
   }
-  return result;
+  return _slot as React.ReactNode;
 }
 
 /**
  * Renders a slot by creating a React element from the slot definition.
+ *
+ * Uses a stable `SlotBridge` wrapper for function/component slots so that:
+ * 1. Hooks inside slot components get their own proper React context
+ * 2. The bridge identity is stable across renders, avoiding unnecessary remounts
  *
  * @template P - The props type for the slot component.
  * @param slot - The slot definition to render.
  * @param props - The props to pass to the slot component.
  * @param key - Optional React key to add to the element.
  * @returns A React node, or `null` if no slot is provided.
- *
- * @example
- * ```tsx
- * const slot = MyComponent;
- * renderSlot(slot, { name: 'John' }); // => <MyComponent name="John" />
- *
- * const slotNode = <div>Hello</div>;
- * renderSlot(slotNode, {}); // => <div>Hello</div>
- *
- * const slotWithProps = { component: MyComponent, props: { age: 30 } };
- * renderSlot(slotWithProps, { name: 'John' }); // => <MyComponent age={30} name="John" />
- * ```
  */
 export function renderSlot<P>(slot: Slot<P> | undefined, props: P, key?: Key): React.ReactNode {
   if (!slot) return null;
 
   if (typeof slot === 'function') {
-    return withKey((slot as any)(props), key);
+    return React.createElement(SlotBridge, { _slot: slot, _slotProps: props, key } as any);
   }
 
   if (isSlotConfig(slot)) {
-    return withKey((slot.component as any)({ ...slot.props, ...props }), key);
+    return React.createElement(SlotBridge, {
+      _slot: slot.component,
+      _slotProps: { ...slot.props, ...props },
+      key,
+    } as any);
   }
 
   return key != null ? <React.Fragment key={key}>{slot}</React.Fragment> : slot;

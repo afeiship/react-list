@@ -234,7 +234,7 @@ describe('ReactList', () => {
   });
 
   describe('inline arrow function slot remount', () => {
-    it('should remount items when slot is an inline arrow function (new ref each render)', () => {
+    it('should NOT remount items when slot is an inline arrow function (new ref each render)', () => {
       const mountTracker = vi.fn();
 
       const InputItem = ({ item }: { item: User; index: number; data: User[] }) => {
@@ -262,8 +262,7 @@ describe('ReactList', () => {
       expect(firstInput).toHaveFocus();
 
       // Re-render creates a NEW inline arrow function
-      // Since renderSlot calls the function directly (no createElement wrapper),
-      // items are NOT remounted — React reconciles the returned JSX directly.
+      // SlotBridge is stable, so items are NOT remounted
       rerender(
         <ReactList
           data={users}
@@ -293,13 +292,11 @@ describe('ReactList', () => {
         );
       };
 
-      const stableSlot = (props: any) => <InputItem {...props} />;
-
       const { rerender } = render(
         <ReactList
           data={users}
           keyExtractor="id"
-          slots={{ item: stableSlot }}
+          slots={{ item: InputItem }}
         />
       );
 
@@ -309,12 +306,12 @@ describe('ReactList', () => {
       firstInput.focus();
       expect(firstInput).toHaveFocus();
 
-      // Re-render with the SAME function ref → React reuses component
+      // Re-render with the SAME component ref → React reuses component
       rerender(
         <ReactList
           data={users}
           keyExtractor="id"
-          slots={{ item: stableSlot }}
+          slots={{ item: InputItem }}
         />
       );
 
@@ -323,6 +320,82 @@ describe('ReactList', () => {
 
       // Same DOM node, focus preserved
       expect(firstInput).toHaveFocus();
+    });
+  });
+
+  describe('hooks in slot components', () => {
+    it('should support useState in slot item components', () => {
+      const CounterItem = ({ item }: { item: User; index: number; data: User[] }) => {
+        const [count, setCount] = React.useState(0);
+        return (
+          <div>
+            <span data-testid={`name-${item.id}`}>{item.name}</span>
+            <span data-testid={`count-${item.id}`}>{count}</span>
+            <button data-testid={`btn-${item.id}`} onClick={() => setCount(c => c + 1)}>
+              inc
+            </button>
+          </div>
+        );
+      };
+
+      render(<ReactList data={users} keyExtractor="id" slots={{ item: CounterItem }} />);
+
+      expect(screen.getByTestId('name-1').textContent).toBe('Alice');
+      expect(screen.getByTestId('count-1').textContent).toBe('0');
+
+      fireEvent.click(screen.getByTestId('btn-1'));
+      expect(screen.getByTestId('count-1').textContent).toBe('1');
+
+      fireEvent.click(screen.getByTestId('btn-2'));
+      expect(screen.getByTestId('count-2').textContent).toBe('1');
+    });
+
+    it('should support useEffect in slot item components', () => {
+      const effectFn = vi.fn();
+
+      const EffectItem = ({ item }: { item: User; index: number; data: User[] }) => {
+        React.useEffect(() => { effectFn(item.id); }, [item.id]);
+        return <div>{item.name}</div>;
+      };
+
+      render(<ReactList data={users} keyExtractor="id" slots={{ item: EffectItem }} />);
+
+      expect(effectFn).toHaveBeenCalledTimes(3);
+      expect(effectFn).toHaveBeenCalledWith(1);
+      expect(effectFn).toHaveBeenCalledWith(2);
+      expect(effectFn).toHaveBeenCalledWith(3);
+    });
+
+    it('should support hooks in slot config components', () => {
+      const ConfigHookItem = ({
+        item,
+        prefix,
+      }: {
+        item: User;
+        index: number;
+        data: User[];
+        prefix: string;
+      }) => {
+        const [count, setCount] = React.useState(0);
+        return (
+          <div>
+            <span data-testid={`label-${item.id}`}>{prefix}{item.name}:{count}</span>
+            <button data-testid={`btn-${item.id}`} onClick={() => setCount(c => c + 1)}>+</button>
+          </div>
+        );
+      };
+
+      render(
+        <ReactList
+          data={users}
+          keyExtractor="id"
+          slots={{ item: { component: ConfigHookItem, props: { prefix: '>> ' } } }}
+        />
+      );
+
+      expect(screen.getByTestId('label-1').textContent).toBe('>> Alice:0');
+      fireEvent.click(screen.getByTestId('btn-2'));
+      expect(screen.getByTestId('label-2').textContent).toBe('>> Bob:1');
     });
   });
 });
