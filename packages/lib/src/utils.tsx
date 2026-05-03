@@ -50,7 +50,7 @@ export function renderSlot<P>(slot: Slot<P> | undefined, props: P, key?: Key): R
   if (!slot) return null;
 
   if (typeof slot === 'function') {
-    return React.createElement(SlotBridge, { _slot: slot, _slotProps: props, key } as any);
+    return React.createElement(SlotBridge, { _slot: slot, _slotProps: props, key });
   }
 
   if (isSlotConfig(slot)) {
@@ -58,7 +58,7 @@ export function renderSlot<P>(slot: Slot<P> | undefined, props: P, key?: Key): R
       _slot: slot.component,
       _slotProps: { ...slot.props, ...props },
       key,
-    } as any);
+    });
   }
 
   return key != null ? <React.Fragment key={key}>{slot}</React.Fragment> : slot;
