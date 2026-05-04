@@ -4,6 +4,7 @@ import { EmptyStateDemo } from './demos/EmptyStateDemo';
 import { SlotPropsDemo } from './demos/SlotPropsDemo';
 import { ReactNodeDemo } from './demos/ReactNodeDemo';
 import { InteractiveDemo } from './demos/InteractiveDemo';
+import { HookSlotDemo } from './demos/HookSlotDemo';
 import './index.css';
 
 function App() {
@@ -40,39 +41,45 @@ function App() {
         </div>
 
         <div className="grid gap-8">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <BasicDemo />
-            </div>
-          </div>
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <BasicDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <KeyExtractorDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <EmptyStateDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <SlotPropsDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <ReactNodeDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/*<div className="card bg-base-100 shadow-xl">*/}
+          {/*  <div className="card-body">*/}
+          {/*    <InteractiveDemo />*/}
+          {/*  </div>*/}
+          {/*</div>*/}
 
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
-              <KeyExtractorDemo />
-            </div>
-          </div>
-
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <EmptyStateDemo />
-            </div>
-          </div>
-
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <SlotPropsDemo />
-            </div>
-          </div>
-
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <ReactNodeDemo />
-            </div>
-          </div>
-
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <InteractiveDemo />
+              <HookSlotDemo />
             </div>
           </div>
         </div>

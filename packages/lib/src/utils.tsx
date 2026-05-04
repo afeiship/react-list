@@ -14,13 +14,16 @@ export function isSlotConfig(
 }
 
 /**
- * A stable bridge component that renders the slot via `createElement`.
+ * A stable bridge component that renders the slot via a stable wrapper.
  *
- * Uses useRef + useState to create a stable wrapper component whose identity
- * never changes across renders. This ensures:
- * 1. The slot component gets its own proper React fiber and hook context
- * 2. The bridge identity is stable, avoiding unnecessary remounts
- * 3. Each list item's hooks are isolated from the parent and siblings
+ * Uses useRef + useState to create a per-item StableSlot component whose identity
+ * never changes across renders. Inside StableSlot, the slot is called directly
+ * (not via createElement) so inline arrow wrappers don't cause remounts.
+ *
+ * This ensures:
+ * 1. StableSlot provides a dedicated fiber host for slot hooks
+ * 2. SlotBridge can safely add its own hooks without conflict
+ * 3. Inline arrow slot refs changing across renders don't cause unmount/remount
  *
  * @internal
  */
@@ -32,7 +35,7 @@ function SlotBridge<P>(bridgeProps: { _slot: Slot<P>; _slotProps: P }) {
   const [StableSlot] = React.useState(
     () =>
       function StableSlot(p: any) {
-        return React.createElement(slotRef.current as React.ComponentType<any>, p);
+        return (slotRef.current as any)(p);
       },
   );
 
@@ -46,10 +49,9 @@ function SlotBridge<P>(bridgeProps: { _slot: Slot<P>; _slotProps: P }) {
 /**
  * Renders a slot by creating a React element from the slot definition.
  *
- * Uses a stable `SlotBridge` wrapper (useRef + useState pattern) for function/component slots so that:
- * 1. The slot component renders through proper React createElement lifecycle
+ * Uses a stable `SlotBridge` wrapper for function/component slots so that:
+ * 1. Hooks inside slot components get their own proper React context
  * 2. The bridge identity is stable across renders, avoiding unnecessary remounts
- * 3. Each list item's hooks are isolated from the parent and siblings
  *
  * @template P - The props type for the slot component.
  * @param slot - The slot definition to render.
