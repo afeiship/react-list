@@ -15,30 +15,41 @@ export function isSlotConfig(
 
 /**
  * A stable bridge component that renders the slot via `createElement`.
- * Defined at module level so its identity never changes across renders,
- * preventing React from remounting the subtree when the parent re-renders.
  *
- * Each list item gets its own SlotBridge instance, so hooks inside the slot
- * component run in a proper per-item React context (not the parent's).
- * The slot is called directly (not via createElement) so the returned element
- * retains its stable component type — inline arrow wrappers don't cause remounts.
+ * Uses useRef + useState to create a stable wrapper component whose identity
+ * never changes across renders. This ensures:
+ * 1. The slot component gets its own proper React fiber and hook context
+ * 2. The bridge identity is stable, avoiding unnecessary remounts
+ * 3. Each list item's hooks are isolated from the parent and siblings
  *
  * @internal
  */
 function SlotBridge<P>(bridgeProps: { _slot: Slot<P>; _slotProps: P }) {
   const { _slot, _slotProps } = bridgeProps;
-  if (typeof _slot === 'function') {
-    return (_slot as any)(_slotProps);
+  const slotRef = React.useRef(_slot);
+  slotRef.current = _slot;
+
+  const [StableSlot] = React.useState(
+    () =>
+      function StableSlot(p: any) {
+        return React.createElement(slotRef.current as React.ComponentType<any>, p);
+      },
+  );
+
+  if (typeof _slot !== 'function') {
+    return _slot as React.ReactNode;
   }
-  return _slot as React.ReactNode;
+
+  return React.createElement(StableSlot as React.ComponentType<any>, _slotProps);
 }
 
 /**
  * Renders a slot by creating a React element from the slot definition.
  *
- * Uses a stable `SlotBridge` wrapper for function/component slots so that:
- * 1. Hooks inside slot components get their own proper React context
+ * Uses a stable `SlotBridge` wrapper (useRef + useState pattern) for function/component slots so that:
+ * 1. The slot component renders through proper React createElement lifecycle
  * 2. The bridge identity is stable across renders, avoiding unnecessary remounts
+ * 3. Each list item's hooks are isolated from the parent and siblings
  *
  * @template P - The props type for the slot component.
  * @param slot - The slot definition to render.

@@ -1,13 +1,13 @@
 /**
  * 05-FocusPreservation.spec.tsx
  *
- * 验证 renderSlot 使用 cloneElement（而非 createElement）策略，
- * 确保内联箭头函数 slot 在 rerender 时不会导致 input 失焦。
+ * 验证 renderSlot 使用 SlotBridge（useRef + useState 稳定包装组件）策略，
+ * 确保稳定的 slot 组件引用在 rerender 时不会导致 input 失焦。
  *
  * 背景：
- * - createElement(slot, props) 会把 slot 函数本身作为组件类型
- * - 每次 rerender 产生新箭头函数 → React 认为组件类型变了 → 卸载重建
- * - cloneElement 作用于 slot 返回的实际元素，内部组件类型引用稳定 → 只更新 props
+ * - SlotBridge 内部使用 useRef 追踪最新 slot，useState 创建稳定包装组件
+ * - 稳定组件引用（直接传组件或 slot config）→ StableSlot 不变 → 不 remount
+ * - 使用 slot config 或直接传组件引用是推荐方式，可保证 focus 和 local state 不丢失
  */
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -32,12 +32,12 @@ const InputItem = ({ item }: { item: User; index: number; data: User[] }) => (
 );
 
 describe('focus preservation', () => {
-  it('should preserve input focus on rerender with inline arrow slot', () => {
+  it('should preserve input focus on rerender with stable slot ref', () => {
     const { rerender } = render(
       <ReactList
         data={users}
         keyExtractor="id"
-        slots={{ item: (props) => <InputItem {...props} /> }}
+        slots={{ item: InputItem }}
       />
     );
 
@@ -45,12 +45,12 @@ describe('focus preservation', () => {
     input.focus();
     expect(input).toHaveFocus();
 
-    // Rerender with same data — inline arrow creates new ref each time
+    // Rerender with same data — stable component ref keeps focus
     rerender(
       <ReactList
         data={users}
         keyExtractor="id"
-        slots={{ item: (props) => <InputItem {...props} /> }}
+        slots={{ item: InputItem }}
       />
     );
 
@@ -62,7 +62,7 @@ describe('focus preservation', () => {
       <ReactList
         data={users}
         keyExtractor="id"
-        slots={{ item: (props) => <InputItem {...props} /> }}
+        slots={{ item: InputItem }}
       />
     );
 
@@ -80,7 +80,7 @@ describe('focus preservation', () => {
       <ReactList
         data={updated}
         keyExtractor="id"
-        slots={{ item: (props) => <InputItem {...props} /> }}
+        slots={{ item: InputItem }}
       />
     );
 
@@ -141,7 +141,7 @@ describe('focus preservation', () => {
       <ReactList
         data={users}
         keyExtractor="id"
-        slots={{ item: (props) => <EditableItem {...props} /> }}
+        slots={{ item: EditableItem }}
       />
     );
 
@@ -158,7 +158,7 @@ describe('focus preservation', () => {
       <ReactList
         data={users}
         keyExtractor="id"
-        slots={{ item: (props) => <EditableItem {...props} /> }}
+        slots={{ item: EditableItem }}
       />
     );
 

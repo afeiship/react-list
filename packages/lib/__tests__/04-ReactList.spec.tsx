@@ -233,8 +233,8 @@ describe('ReactList', () => {
     expect(screen.getByText('Beijing')).toBeInTheDocument();
   });
 
-  describe('inline arrow function slot remount', () => {
-    it('should NOT remount items when slot is an inline arrow function (new ref each render)', () => {
+  describe('slot remount behavior', () => {
+    it('should NOT remount items when slot component ref is stable', () => {
       const mountTracker = vi.fn();
 
       const InputItem = ({ item }: { item: User; index: number; data: User[] }) => {
@@ -251,7 +251,7 @@ describe('ReactList', () => {
         <ReactList
           data={users}
           keyExtractor="id"
-          slots={{ item: (props) => <InputItem {...props} /> }}
+          slots={{ item: { component: InputItem } }}
         />
       );
 
@@ -261,13 +261,12 @@ describe('ReactList', () => {
       firstInput.focus();
       expect(firstInput).toHaveFocus();
 
-      // Re-render creates a NEW inline arrow function
-      // SlotBridge is stable, so items are NOT remounted
+      // Re-render with same stable component ref → items are NOT remounted
       rerender(
         <ReactList
           data={users}
           keyExtractor="id"
-          slots={{ item: (props) => <InputItem {...props} /> }}
+          slots={{ item: { component: InputItem } }}
         />
       );
 
